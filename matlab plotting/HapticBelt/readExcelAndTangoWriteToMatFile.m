@@ -4,16 +4,22 @@
 % and also rewrites the processed Data files with fixed times and additional 
 % infos into a separate folder called ProcessedDataFixed/
 
-
+%% EDIT FILE NAMES BELOW IF NEEDED
 dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
 %dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
 
 fileIn = 'data-analysis-blind-users-20160524.xlsx';
+
+processedDataFolderName = 'processedData/';
+processedDataFilesPath = [dropboxPath,processedDataFolderName];
+processedDataFileName = '*.mat';
+
 fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
 filePathOutTango = strcat(dropboxPath,fileOutTango);
 %fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
 %filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
 
+%% AFTER THIS POINT NO CUSTOMIZATION NEEDED, hopefully
 idColName = 'id';
 sheet = 1;
 
@@ -62,20 +68,14 @@ end
 
 data = raw(elementsRelevant,:);
 
+% fileOut = 'data-analysis-blind-users-20160524_without_tango.mat';
+% filePathOut = strcat(dropboxPath,fileOut);
+% 
+% save(filePathOut,'dataheader','data');
 
-fileOut = 'data-analysis-blind-users-20160524_without_tango.mat';
-filePathOut = strcat(dropboxPath,fileOut);
+%% add tango data to it!
 
-save(filePathOut,'dataheader','data');
-
-% add tango data to it!
-
-%TODO
-processedDataFolderName = 'processedData/';
-processedDataFilesPath = [dropboxPath,processedDataFolderName];
-processedDataFileName = '*.mat';
-
-% loop through all files
+% loop through all the tango data files
 
 processedDataFiles = dir([processedDataFilesPath,processedDataFileName]);
 idNumArray = NaN(length(processedDataFiles),1);
@@ -99,7 +99,7 @@ for file = processedDataFiles'
     [isItMember,rowInData] = ismember(dataSet.id,idVector);
     
     if ~isItMember
-        error(['test number ',dataSet.id,' in ',file.name, 'does not exist']);
+        error(['ID number ',dataSet.id,' in ',file.name, 'does not exist']);
     end
     %append the test number
     idNumArray(counter) = dataSet.id;
@@ -164,12 +164,16 @@ for file = processedDataFiles'
     save(filePathAbsFixed,'-struct','dataSet');
 end
 
+% generate some redundant presentations of data
 structByHeader = cell2struct(data, dataheader, 2);
 subsetDataForTimeErrorChecking = dataToWrite(:,[1,21,26,27,35,41,44,45]);
 dataCombined = [dataheader;data];
+
+% save the data to a mat file for further processing
 save(filePathOutTango,'dataheader','data','structByHeader','subsetDataForTimeErrorChecking','dataCombined');
 
-%
+%% TODO:
+% The following is not working properly yet: Writing to csv
 % fid=fopen(filePathOutTangoCSV,'wt');
 % 
 % [rows,cols]=size(dataToWrite);
