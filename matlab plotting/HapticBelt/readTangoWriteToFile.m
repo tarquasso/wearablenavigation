@@ -11,7 +11,7 @@ filePathIn = strcat(dropboxPath,fileIn);
 
 firstRow = raw(1,:);
 validTitleStrings = matlab.lang.makeValidName(firstRow);
-ID = matlab.lang.makeUniqueStrings(validTitleStrings,{},...
+dataheader = matlab.lang.makeUniqueStrings(validTitleStrings,{},...
     namelengthmax);
 
 
@@ -29,26 +29,25 @@ end
 idColRaw = raw(:,idCol);
 elementsNumeric = cellfun(@(x) isnumeric(x) && ~isnan(x) , idColRaw);
 elementsRelevant = find(elementsNumeric);
-id = cell2mat(idColRaw(elementsRelevant));
+idVector = cell2mat(idColRaw(elementsRelevant));
 
 %check if id numbers are integers:
-if ~all(~mod(id,1))
+if ~all(~mod(idVector,1))
     error('id numbers have to all be integers!')
 end
 
 %%
 
 %check if the id numbers are unique
-[n, bin] = histc(id, unique(id));
+[n, bin] = histc(idVector, unique(idVector));
 multiple = find(n > 1);
 index    = find(ismember(bin, multiple));
 
 if ~isempty(index)
     error(strcat('id numbers are not unique, see indices:', mat2str(index)));
 end
-%%
-%find usernum column
 
+%% Extract the rest of the data
 
 data = raw(elementsRelevant,:);
 
@@ -56,15 +55,135 @@ data = raw(elementsRelevant,:);
 fileOut = 'data-analysis-blind-users-20160524_without_tango.mat';
 filePathOut = strcat(dropboxPath,fileOut);
 
-save(filePathOut,'ID','data');
+save(filePathOut,'dataheader','data');
 
 % add tango data to it!
 
 %TODO
+processedDataFolderName = 'processedData/';
+processedDataFileName = '*.mat';
+processedDataFilesPath = [dropboxPath,processedDataFolderName];
 
+% loop through all files
+
+processedDataFiles = dir([processedDataFilesPath,processedDataFileName]);
+idNumArray = NaN(length(processedDataFiles),1);
+counter = 1;
+
+for file = processedDataFiles'
+    % load data of the first file in the folder
+    filePathAbs = [processedDataFilesPath,file.name];
+    dataSetOrig = load(filePathAbs);
+    dataSet = dataSetOrig;
+    % Check if the data already contains an id number
+    if ~isfield(dataSet,'id')
+        % extract from file name
+        [idOfTrial,remain] = strtok(file.name);
+        dataSet.id = str2double(idOfTrial);
+    end
+    if any(dataSet.id==idNumArray)
+        error(['ID number ',dataSet.id,' in ',file.name, 'was already processed']);
+    end
+    % find if test exists in the id column of the data!
+    [isItMember,rowInData] = ismember(dataSet.id,idVector);
+    
+    if ~isItMember
+        error(['test number ',dataSet.id,' in ',file.name, 'does not exist']);
+    end
+    %append the test number
+    idNumArray(counter) = dataSet.id;
+    
+    %     % fix time issue, if it exists
+    %     tt1 = dataSet.total_time;
+    %     if tt1 < 0
+    %
+    delta = diff(dataSet.time);
+    index = find(delta<0);
+    if isempty(index)
+        index = NaN;
+    else
+        for iter = 1:length(index)
+            dataSet.time(index(iter)+1:end) = dataSet.time(index(iter)+1:end)+100000;
+        end
+        deltaNew = diff(dataSet.time);
+        indexNew = find(deltaNew<0);
+        if ~isempty(indexNew)
+            error(['time problem not fixed for test number ',dataSet.id,' in ',file.name]);
+        end
+        if1 = dataSet.index_first;
+        il1 = dataSet.index_last;
+        
+        dataSet.total_time = (dataSet.time(il1) - dataSet.time(if1))/1000;
+        
+        dataSet.ave_velocity = dataSet.distance/dataSet.total_time;
+    end
+    dataSet.time_jumps_index = index;
+    [~,colVD,vVD] = find(strcmp(dataheader,'VideoDuration_s_'));
+    if isempty(vVD)
+        error(['can not find video duration column for test number ',dataSet.id,' in ',file.name]);
+    end
+    dataSet.deltaTimeVideoTango = dataSet.total_time - data{rowInData,colVD};
+   
+    %     end
+    
+    fields = fieldnames(dataSet);
+    %iterate through all the datavalues
+    for jj = 1:numel(fields)
+        % find appropriate column
+        [~,colF,vF] = find(strcmp(dataheader,fields{jj}));
+        if ~isempty(vF)
+            data{rowInData,colF} = dataSet.(fields{jj});
+        end
+    end
+    counter = counter+1;
+    % Fix the file
+    % saveAsFileName = filePathAbs;
+    % save(filePathAbs,'x','y','orig_x','orig_y','time','index_first','index_last','theta','total_time','y_shift','x_shift','distance','ave_velocity','mazeNum','z','orig_z','userNum','testNum','id');
+    %
+end
+
+%
+% x = data{1};
+% y = data{2};
+% orig_x = data{5};
+% orig_y = data{6};
+% time = data{8};
+% index_first = data{3};
+% index_last = data{4};
+% theta = data{7};
+% y_shift = data{9};
+% x_shift = data{10};
+% saveName = data{11};
+% mazeNum = data{12};
+% z = data{13};
+% orig_z = data{14};
+% userNum = data{16};
+% testNum = data{17};
+% saveAs = data{18};
+% saveAs = strcat(dropboxPath,'processedData/',saveAs);
+%
+% distance = findDistance(x(index_first:index_last),y(index_first:index_last));
+% total_time = (time(index_last) - time(index_first))/1000;
+% ave_velocity = distance/total_time;
+%
+
+%
+%
 fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
 filePathOutTango = strcat(dropboxPath,fileOutTango);
 
-save(filePathOutTango,'ID','data_compiled');
+save(filePathOutTango,'dataheader','data');
 
-
+fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
+filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
+dataToWrite = [dataheader;data];
+subsetData = dataToWrite(:,[1,21,26,27,35,41,44,45]);
+%
+% fid=fopen(filePathOutTangoCSV,'wt');
+% 
+% [rows,cols]=size(dataToWrite);
+% for i=1:rows
+%       fprintf(fid,'%s,',dataToWrite{i,1:end-1});
+%       fprintf(fid,'%s\n',dataToWrite{i,end});
+% end
+% fclose(fid);
