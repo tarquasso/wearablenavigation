@@ -61,8 +61,8 @@ save(filePathOut,'dataheader','data');
 
 %TODO
 processedDataFolderName = 'processedData/';
-processedDataFileName = '*.mat';
 processedDataFilesPath = [dropboxPath,processedDataFolderName];
+processedDataFileName = '*.mat';
 
 % loop through all files
 
@@ -117,14 +117,23 @@ for file = processedDataFiles'
         
         dataSet.ave_velocity = dataSet.distance/dataSet.total_time;
     end
+    
     dataSet.time_jumps_index = index;
+    % add some more data variables
+    
     [~,colVD,vVD] = find(strcmp(dataheader,'VideoDuration_s_'));
     if isempty(vVD)
         error(['can not find video duration column for test number ',dataSet.id,' in ',file.name]);
     end
+    
+    dataSet.VideoDuration_s_ = data{rowInData,colVD};
     dataSet.deltaTimeVideoTango = dataSet.total_time - data{rowInData,colVD};
    
-    %     end
+    [~,colTG,vTG] = find(strcmp(dataheader,'tango'));
+    if isempty(vTG)
+        error(['can not find tango column for test number ',dataSet.id,' in ',file.name]);
+    end
+    dataSet.tango = data{rowInData,colTG};
     
     fields = fieldnames(dataSet);
     %iterate through all the datavalues
@@ -136,43 +145,19 @@ for file = processedDataFiles'
         end
     end
     counter = counter+1;
-    % Fix the file
-    % saveAsFileName = filePathAbs;
-    % save(filePathAbs,'x','y','orig_x','orig_y','time','index_first','index_last','theta','total_time','y_shift','x_shift','distance','ave_velocity','mazeNum','z','orig_z','userNum','testNum','id');
-    %
+    % Save the fixed file
+    processedDataFolderNameFixed = 'processedDataFixed/';
+    processedDataFilesPathFixed = [dropboxPath,processedDataFolderNameFixed];
+
+    filePathAbsFixed = [processedDataFilesPathFixed,file.name];
+    save(filePathAbsFixed,'-struct','dataSet');
 end
 
-%
-% x = data{1};
-% y = data{2};
-% orig_x = data{5};
-% orig_y = data{6};
-% time = data{8};
-% index_first = data{3};
-% index_last = data{4};
-% theta = data{7};
-% y_shift = data{9};
-% x_shift = data{10};
-% saveName = data{11};
-% mazeNum = data{12};
-% z = data{13};
-% orig_z = data{14};
-% userNum = data{16};
-% testNum = data{17};
-% saveAs = data{18};
-% saveAs = strcat(dropboxPath,'processedData/',saveAs);
-%
-% distance = findDistance(x(index_first:index_last),y(index_first:index_last));
-% total_time = (time(index_last) - time(index_first))/1000;
-% ave_velocity = distance/total_time;
-%
-
-%
-%
 fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
 filePathOutTango = strcat(dropboxPath,fileOutTango);
 
-save(filePathOutTango,'dataheader','data');
+structByHeader = cell2struct(data, dataheader, 2);
+save(filePathOutTango,'dataheader','data','structByHeader');
 
 fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
 filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
