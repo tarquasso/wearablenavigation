@@ -1,8 +1,19 @@
+% Description: this takes in the spreadsheet 'data-analysis-blind-users-20160524.xlsx'
+%  and the files in the ProcessedData folder, 
+% then outputs it to a big .mat file in the dropbox: data-analysis-blind-users-20160524_with_tango.mat
+% and also rewrites the processed Data files with fixed times and additional 
+% infos into a separate folder called ProcessedDataFixed/
+
 
 dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
 %dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
 
 fileIn = 'data-analysis-blind-users-20160524.xlsx';
+fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
+filePathOutTango = strcat(dropboxPath,fileOutTango);
+%fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
+%filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
+
 idColName = 'id';
 sheet = 1;
 
@@ -153,16 +164,11 @@ for file = processedDataFiles'
     save(filePathAbsFixed,'-struct','dataSet');
 end
 
-fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
-filePathOutTango = strcat(dropboxPath,fileOutTango);
-
 structByHeader = cell2struct(data, dataheader, 2);
-save(filePathOutTango,'dataheader','data','structByHeader');
+subsetDataForTimeErrorChecking = dataToWrite(:,[1,21,26,27,35,41,44,45]);
+dataCombined = [dataheader;data];
+save(filePathOutTango,'dataheader','data','structByHeader','subsetDataForTimeErrorChecking','dataCombined');
 
-fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
-filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
-dataToWrite = [dataheader;data];
-subsetData = dataToWrite(:,[1,21,26,27,35,41,44,45]);
 %
 % fid=fopen(filePathOutTangoCSV,'wt');
 % 
