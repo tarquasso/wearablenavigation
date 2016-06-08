@@ -1,0 +1,24 @@
+--- RUNNING CODE ---
+open processDataScriptExcel.m
+change the dropbox path to make it work for your computer
+run processDataScriptExcel.m
+
+
+--- HOW THE GUI WORKS ---
+Right now you can move to the next valid maze test by clicking the "Next Test" button.
+You can make modifications to the maze (x shift, y shift, rotate, clip data)
+Notes: There is no "scale" function. This is because I'm worried about misrepresenting the data. I could easily add a scaling function though.
+Notes: "Flatten data" doesn't work unfortunately (having issues since sometimes you need to rotate +, sometimes -), but I don't think it's necessary (when the rotation does work, it hardly makes a difference).
+
+--- WHAT EACH FILE DOES --
+
+processDataScriptExcel.m --- a wrapped script for process_tango_data_excel.m
+
+process_tango_data_excel.m --- the gui for processing the data
+
+plot_maze.m --- function that plots one of 4 mazes
+
+findTestData.m --- given data from the excel spreadsheet, it parses through the data and returns only the tests that should be processed
+
+rotatePoints.m --- function for rotating a matrix
+
