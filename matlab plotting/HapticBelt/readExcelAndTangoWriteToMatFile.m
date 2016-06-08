@@ -16,10 +16,11 @@ processedDataFileName = '*.mat';
 
 fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
 filePathOutTango = strcat(dropboxPath,fileOutTango);
+% writing to csv not fully functional yet...
 %fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
 %filePathOutTangoCSV = strcat(dropboxPath,fileOutTangoCSV);
 
-%% AFTER THIS POINT NO CUSTOMIZATION NEEDED, hopefully
+%% AFTER THIS POINT NO CUSTOMIZATION NEEDED, hopefully...
 idColName = 'id';
 sheet = 1;
 
@@ -166,19 +167,20 @@ end
 
 % generate some redundant presentations of data
 structByHeader = cell2struct(data, dataheader, 2);
-subsetDataForTimeErrorChecking = dataToWrite(:,[1,21,26,27,35,41,44,45]);
 dataCombined = [dataheader;data];
+subsetDataForTimeErrorChecking = dataCombined(:,[1,21,26,27,35,41,44,45]);
 
 % save the data to a mat file for further processing
 save(filePathOutTango,'dataheader','data','structByHeader','subsetDataForTimeErrorChecking','dataCombined');
 
 %% TODO:
 % The following is not working properly yet: Writing to csv
+
 % fid=fopen(filePathOutTangoCSV,'wt');
 % 
-% [rows,cols]=size(dataToWrite);
+% [rows,cols]=size(dataCombined);
 % for i=1:rows
-%       fprintf(fid,'%s,',dataToWrite{i,1:end-1});
-%       fprintf(fid,'%s\n',dataToWrite{i,end});
+%       fprintf(fid,'%s,',dataCombined{i,1:end-1});
+%       fprintf(fid,'%s\n',dataCombined{i,end});
 % end
 % fclose(fid);
