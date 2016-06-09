@@ -167,7 +167,7 @@ global dropboxPath f1
 
 data = guidata(f1);
 
-saveAs = strcat(dropboxPath,'processedDataNew/',data.saveAs);
+saveAs = strcat(dropboxPath,'processedData/',data.saveAs);
 save(saveAs,'-struct','data');
 
 end
