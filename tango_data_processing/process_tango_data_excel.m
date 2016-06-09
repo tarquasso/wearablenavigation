@@ -1,5 +1,5 @@
 function process_tango_data_excel()
-global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath num txt sp1 sp2 f1
+global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath num txt sp1 sp2 f1 uiH
 
 dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
 %dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
@@ -38,85 +38,105 @@ data = processNextTrial(userNum,testNum);
 guidata(f1, data);
 
 %plot the path
-plotPath();
+calculationsAndPlotPath();
 
-% Control Theta
-b1 = uicontrol('Parent',f1,'Style','slider','Position',[100,40,419,23],...
-              'value',data.theta, 'min',-120, 'max',180,'SliderStep',[0.0007 0.10]);
-b1.Callback = @(es,ed) rotateData(es,ed);
+uiH = struct();
 
-% Control 
-b2 = uicontrol('Parent',f1,'Style','slider','Position',[100,20,419,23],...
-              'value',data.index_first, 'min',1, 'max',(data.index_last+data.index_first)/2,'SliderStep',[0.0007 0.10]);
-b2.Callback = @(es,ed) clipDataFirst(es,ed);
+% Controllers
+uiH.thetaDeg = uicontrol('Parent',f1,'Style','slider','Position',[100,40,419,23],...
+              'value',data.theta*180/pi, 'min',-180, 'max',180,'SliderStep',[0.0007 0.10]);
+uiH.thetaDeg.Callback = @(es,ed) rotateDataCallback(es,ed);
 
+uiH.index_first = uicontrol('Parent',f1,'Style','slider','Position',[100,20,419,23],...
+              'value',data.index_first, 'min',1, 'max',length(data.orig_x),'SliderStep',[0.0007 0.10]);
+uiH.index_first.Callback = @(es,ed) clipDataFirst(es,ed);
 
-b3 = uicontrol('Parent',f1,'Style','slider','Position',[100,0,419,23],...
-              'value',data.index_last, 'min',(data.index_last+data.index_first)/2, 'max',length(data.orig_x),'SliderStep',[0.0009 0.10]);
-b3.Callback = @(es,ed) clipDataLast(es,ed);
+uiH.index_last = uicontrol('Parent',f1,'Style','slider','Position',[100,0,419,23],...
+              'value',data.index_last, 'min',1, 'max',length(data.orig_x),'SliderStep',[0.0009 0.10]);
+uiH.index_last.Callback = @(es,ed) clipDataLast(es,ed);
 
-b4 = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,60,60,23],...
+uiH.saveUi = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,60,60,23],...
               'String','Save');
-b4.Callback = @(es,ed) saveData(es,ed);
+uiH.saveUi.Callback = @(es,ed) saveData(es,ed);
 
-b5 = uicontrol('Parent',f1,'Style','slider','Position',[100,60,419,23],...
+uiH.y_shift = uicontrol('Parent',f1,'Style','slider','Position',[100,60,419,23],...
               'value',data.y_shift, 'min',0, 'max',2,'SliderStep',[0.005 0.10]);
-b5.Callback = @(es,ed) shiftY(es,ed);
+uiH.y_shift.Callback = @(es,ed) shiftY(es,ed);
 
-b6 = uicontrol('Parent',f1,'Style','slider','Position',[100,80,419,23],...
+uiH.x_shift = uicontrol('Parent',f1,'Style','slider','Position',[100,80,419,23],...
               'value',data.x_shift, 'min',-3, 'max',3,'SliderStep',[0.0015 0.02]);
-b6.Callback = @(es,ed) shiftX(es,ed);
+uiH.x_shift.Callback = @(es,ed) shiftX(es,ed);
 
-b9 = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,330,70,23],...
+uiH.flattenData = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,330,70,23],...
               'String','Flatten Data');
-b9.Callback = @(es,ed) flattenData(es,ed,ax);
+uiH.flattenData.Callback = @(es,ed) flattenData(es,ed,ax);
 
-b10 = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,230,70,23],...
+uiH.nextTest = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,230,70,23],...
               'String','Next Test -->');
-b10.Callback = @(es,ed) nextTest(es,ed);
+uiH.nextTest.Callback = @(es,ed) nextTest(es,ed);
 
-b11 = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],...
+uiH.load = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],...
               'String','Load');
-b11.Callback = @(es,ed) loadData(es,ed);
+uiH.load.Callback = @(es,ed) loadData(es,ed);
 
-shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
+% Labels
+uiH.shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
               'String','x_shift');
 
-shiftY_label = uicontrol('Parent',f1,'Style','text','Position',[40,60,50,23],...
+uiH.shiftY_label = uicontrol('Parent',f1,'Style','text','Position',[40,60,50,23],...
               'String','y_shift');
           
-rotate_label = uicontrol('Parent',f1,'Style','text','Position',[40,40,50,23],...
+uiH.rotate_label = uicontrol('Parent',f1,'Style','text','Position',[40,40,50,23],...
               'String','rotate');
           
-clipDataFirst_label = uicontrol('Parent',f1,'Style','text','Position',[35,20,60,23],...
-              'String','clipDataFirst');
+uiH.clipDataFirst_label = uicontrol('Parent',f1,'Style','text','Position',[35,20,60,23],...
+              'String','clipBegin');
           
-clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,60,23],...
-              'String','clipDataLast');
+uiH.clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,60,23],...
+              'String','clipEnd');
           
 end
 
 function loadData(es,ed)
-global dropboxPath
+global dropboxPath uiH
 
 d = guidata(es);
 
 loadFrom = strcat(dropboxPath,'processedData/',d.saveAs);
 loadedData = load(loadFrom);
 
-if ~isfield(loadedData,'saveAs')
-    loadedData.saveAs = d.saveAs;
-end
-
-if ~isfield(loadedData,'mazeOrBox')
-    loadedData.mazeOrBox = d.mazeOrBox;
-end
-
 %% TODO update uicontrol
 
-guidata(es, loadedData);
+d.index_first = loadedData.index_first;
+d.index_last = loadedData.index_last;
+d.x_shift = loadedData.x_shift;
+d.y_shift = loadedData.y_shift;
+if abs(loadedData.theta) > pi/4
+    d.theta = loadedData.theta/180*pi;
+else
+    d.theta = loadedData.theta;
+end
+guidata(es, d);
 
-plotPath();
+updateUI();
+
+calculationsAndPlotPath();
+
+end
+
+function updateUI()
+
+global f1 uiH
+
+d = guidata(f1);
+
+set(uiH.index_first,'max',length(d.x))
+set(uiH.index_last,'max',length(d.x))
+set(uiH.index_first, 'value', d.index_first);
+set(uiH.index_last, 'value', d.index_last);
+set(uiH.y_shift, 'value', d.y_shift);
+set(uiH.x_shift, 'value', d.x_shift);
+set(uiH.thetaDeg, 'value', (d.theta*180/pi));
 
 end
 
@@ -186,35 +206,31 @@ function flattenData(es,ax,f1)
     
     guidata(es, data);
         
-    plotPath();
+    calculationsAndPlotPath();
 
 end
+function [xrot,yrot] = rotateData(x,y,theta)
 
-function rotateData(es,ed)
-
-data = guidata(es);
-theta = es.Value*pi/180;
-
-x = data.orig_x;
-y = data.orig_y;
-index_first = data.index_first;
 %translate the 'index_first' point to the origin
 %so that rotation occurs around the index_first point
-x = x - x(index_first); 
-y = y - y(index_first);
 r = [cos(theta) sin(theta); -sin(theta) cos(theta)];
 points = [x y];
 newpoints = (r*points')';
-x = newpoints(:,1);
-y = newpoints(:,2);
+xrot = newpoints(:,1);
+yrot = newpoints(:,2);
 
-data.x = x;
-data.y = y;
-data.theta = es.Value;
+end
+
+function rotateDataCallback(es,ed)
+
+data = guidata(es);
+
+thetaDeg = es.Value;
+data.theta = thetaDeg*pi/180;
 
 guidata(es, data);
 
-plotPath();
+calculationsAndPlotPath();
 
 end
 
@@ -228,7 +244,7 @@ d.y = d.y - d.y(d.index_first);
 
 guidata(es,d);
 
-plotPath();
+calculationsAndPlotPath();
 
 end
 
@@ -238,7 +254,7 @@ d = guidata(es);
 d.index_last = floor(es.Value);
 guidata(es,d);
 
-plotPath();
+calculationsAndPlotPath();
 
 end
 
@@ -248,7 +264,7 @@ d = guidata(es);
 d.y_shift = es.Value;
 guidata(es,d);
 
-plotPath();
+calculationsAndPlotPath();
 
 end
 
@@ -259,11 +275,11 @@ d.x_shift = es.Value;
 
 guidata(es,d);
 
-plotPath();
+calculationsAndPlotPath();
 
 end
 
-function plotPath()
+function calculationsAndPlotPath()
 global f1 sp1 sp2
 
 %first redo calculations
@@ -271,6 +287,16 @@ d = guidata(f1);
 d.distance = calculateDistance(d.x(d.index_first:d.index_last),d.y(d.index_first:d.index_last));
 d.total_time = (d.time(d.index_last) - d.time(d.index_first))/1000;
 d.ave_velocity = d.distance/d.total_time;
+
+x = d.orig_x;
+y = d.orig_y;
+%translate the 'index_first' point to the origin
+%so that rotation occurs around the index_first point
+x = x - x(d.index_first); 
+y = y - y(d.index_first);
+
+[d.x,d.y] = rotateData(x,y,d.theta);
+
 guidata(f1,d);
 
 % now plot
@@ -288,7 +314,7 @@ hold off;
 plot(sp1,d.z(d.index_first:d.index_last));
 
 title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n userNum = %02d testNum = %03d \n saveAs = %s', ...
-    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.userNum,d.testNum,d.saveAs));
+    d.theta*180/pi,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.userNum,d.testNum,d.saveAs));
 
 end
 
@@ -311,13 +337,15 @@ data = processNextTrial(userNumNext,testNumNext);
 %store data into the gui
 guidata(f1, data);
 
+updateUI();
+
 %plot the path
-plotPath();
+calculationsAndPlotPath();
 
 end
 
 function data = processNextTrial(userNum,testNum)
-global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath
+global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH
 
 foundTest = 0;
 for i=userNum:numUsers
