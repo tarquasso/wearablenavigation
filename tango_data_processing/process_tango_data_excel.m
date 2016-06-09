@@ -42,9 +42,9 @@ calculationsAndPlotPath();
 uiH = struct();
 
 % Controllers
-uiH.thetaDeg = uicontrol('Parent',f1,'Style','slider','Position',[100,40,419,23],...
-              'value',data.theta*180/pi, 'min',-180, 'max',180,'SliderStep',[0.0007 0.10]);
-uiH.thetaDeg.Callback = @(es,ed) rotateDataCallback(es,ed);
+uiH.theta = uicontrol('Parent',f1,'Style','slider','Position',[100,40,419,23],...
+              'value',data.theta, 'min',-179.99, 'max',180,'SliderStep',[0.0007 0.10]);
+uiH.theta.Callback = @(es,ed) rotateDataCallback(es,ed);
 
 uiH.index_first = uicontrol('Parent',f1,'Style','slider','Position',[100,20,419,23],...
               'value',data.index_first, 'min',1, 'max',length(data.orig_x),'SliderStep',[0.0007 0.10]);
@@ -127,11 +127,7 @@ d.index_first = loadedData.index_first;
 d.index_last = loadedData.index_last;
 d.x_shift = loadedData.x_shift;
 d.y_shift = loadedData.y_shift;
-if abs(loadedData.theta) > pi/4
-    d.theta = loadedData.theta/180*pi;
-else
-    d.theta = loadedData.theta;
-end
+d.theta = loadedData.theta;
 guidata(f1, d);
 
 updateUI();
@@ -158,7 +154,7 @@ set(uiH.index_first, 'value', d.index_first);
 set(uiH.index_last, 'value', d.index_last);
 set(uiH.y_shift, 'value', d.y_shift);
 set(uiH.x_shift, 'value', d.x_shift);
-set(uiH.thetaDeg, 'value', (d.theta*180/pi));
+set(uiH.theta, 'value', (d.theta));
 
 end
 
@@ -237,12 +233,12 @@ function flattenData(es,ax,f1)
     calculationsAndPlotPath();
 
 end
-function [xrot,yrot] = rotateData(x,y,theta)
+function [xrot,yrot] = rotateData(xorig,yorig,thetaRad)
 
-%translate the 'index_first' point to the origin
-%so that rotation occurs around the index_first point
-r = [cos(theta) sin(theta); -sin(theta) cos(theta)];
-points = [x y];
+%angle input in radian
+
+r = [cos(thetaRad) sin(thetaRad); -sin(thetaRad) cos(thetaRad)];
+points = [xorig yorig];
 newpoints = (r*points')';
 xrot = newpoints(:,1);
 yrot = newpoints(:,2);
@@ -253,8 +249,7 @@ function rotateDataCallback(es,ed)
 
 data = guidata(es);
 
-thetaDeg = es.Value;
-data.theta = thetaDeg*pi/180;
+data.theta = es.Value;
 
 guidata(es, data);
 
@@ -316,14 +311,16 @@ d.distance = calculateDistance(d.x(d.index_first:d.index_last),d.y(d.index_first
 d.total_time = (d.time(d.index_last) - d.time(d.index_first))/1000;
 d.ave_velocity = d.distance/d.total_time;
 
-x = d.orig_x;
-y = d.orig_y;
+xorig = d.orig_x;
+yorig = d.orig_y;
 %translate the 'index_first' point to the origin
 %so that rotation occurs around the index_first point
-x = x - x(d.index_first); 
-y = y - y(d.index_first);
-
-[d.x,d.y] = rotateData(x,y,d.theta);
+xNotRotated = xorig - xorig(d.index_first); 
+yNotRotated = yorig - yorig(d.index_first);
+%convert degrees to radian:
+thetaRad = d.theta*pi/180;
+%rotate data
+[d.x,d.y] = rotateData(xNotRotated,yNotRotated,thetaRad);
 
 guidata(f1,d);
 
@@ -342,7 +339,7 @@ hold off;
 plot(sp1,d.z(d.index_first:d.index_last));
 
 title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n userNum = %02d testNum = %03d \n saveAs = %s', ...
-    d.theta*180/pi,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.userNum,d.testNum,d.saveAs));
+    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.userNum,d.testNum,d.saveAs));
 
 end
 
@@ -448,7 +445,6 @@ end
 x = x - x(1);
 y = y - y(1);
 
-theta = 0;
 index_first = 1;
 index_last = length(x);
 
@@ -476,7 +472,7 @@ data.index_first = index_first;
 data.index_last = index_last;
 data.orig_x = x; % these are intended to store the ORIGINAL x, y data
 data.orig_y = y;
-data.theta = theta;
+data.theta = 0;
 data.time = t;
 data.y_shift = y_shift;
 data.x_shift = x_shift;
