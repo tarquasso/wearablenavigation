@@ -63,7 +63,7 @@ for i=3:length(files)
     x = [x; file(:,1)];
     y = [y; file(:,2)];
     z = [z; file(:,3)];
-    t = [t; mod(file(:,11), 100000)];
+    t = [t; mod(file(:,11), 10000000)];
 end
 
 x = x - x(1);
@@ -492,7 +492,7 @@ for i=3:length(files)
     x = [x; file(:,1)];
     y = [y; file(:,2)];
     z = [z; file(:,3)];
-    t = [t; mod(file(:,11), 100000)];
+    t = [t; mod(file(:,11), 10000000)];
 end
 
 x = x - x(1);
