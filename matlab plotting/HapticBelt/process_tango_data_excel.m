@@ -38,12 +38,10 @@ for i=1:numUsers
     end
 end
 
-try
-    fileString = ls(path);
-catch
-    path = strcat(path,'vio_rgb/');
-    fileString = ls(path);
-end
+
+path = strcat(path,'vio_rgb/');
+fileString = ls(path);
+
 
 files = sort(strsplit(fileString,{'\t','\n','\0'},'CollapseDelimiters',true));
 
@@ -56,6 +54,7 @@ for i=3:length(files)
     fileString = strcat(path, files{i});
     if i == 3
         file = dlmread(fileString,',',3,0);
+        tinit = file(1,11);
     else
         file = dlmread(fileString);
     end
@@ -63,7 +62,7 @@ for i=3:length(files)
     x = [x; file(:,1)];
     y = [y; file(:,2)];
     z = [z; file(:,3)];
-    t = [t; mod(file(:,11), 100000)];
+    t = [t; file(:,11)-tinit];
 end
 
 x = x - x(1);
