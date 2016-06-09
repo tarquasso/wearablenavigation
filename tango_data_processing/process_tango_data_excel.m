@@ -19,7 +19,6 @@ testNameCol = 2;
 userFolderCol = 9;
 numUsers = size(tests,1);
 
-
 userNum = 1;
 testNum = 1;
 
@@ -57,7 +56,7 @@ uiH.index_last.Callback = @(es,ed) clipDataLast(es,ed);
 
 uiH.saveUi = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,60,60,23],...
               'String','Save');
-uiH.saveUi.Callback = @(es,ed) saveData(es,ed);
+uiH.saveUi.Callback = @(es,ed) saveDataCB(es,ed);
 
 uiH.y_shift = uicontrol('Parent',f1,'Style','slider','Position',[100,60,419,23],...
               'value',data.y_shift, 'min',0, 'max',2,'SliderStep',[0.005 0.10]);
@@ -73,11 +72,16 @@ uiH.flattenData.Callback = @(es,ed) flattenData(es,ed,ax);
 
 uiH.nextTest = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,230,70,23],...
               'String','Next Test -->');
-uiH.nextTest.Callback = @(es,ed) nextTest(es,ed);
+uiH.nextTest.Callback = @(es,ed) nextTestCB(es,ed);
+
+uiH.nextTest = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,180,170,23],...
+              'String','Next Test (Save and Load)-->');
+uiH.nextTest.Callback = @(es,ed) nextTestSaveAndLoadCB(es,ed);
+
 
 uiH.load = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],...
               'String','Load');
-uiH.load.Callback = @(es,ed) loadData(es,ed);
+uiH.load.Callback = @(es,ed) loadDataCB(es,ed);
 
 % Labels
 uiH.shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
@@ -97,14 +101,26 @@ uiH.clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,6
           
 end
 
-function loadData(es,ed)
-global dropboxPath uiH
+function nextTestSaveAndLoadCB(es,ed)
 
-d = guidata(es);
+saveData();
+nextTest();
+loadData();
+
+end
+
+function loadData()
+global f1 dropboxPath
+
+d = guidata(f1);
 
 loadFrom = strcat(dropboxPath,'processedData/',d.saveAs);
+try
 loadedData = load(loadFrom);
-
+catch
+    warning('no data exists yet for this trial');
+    return;
+end  
 %% TODO update uicontrol
 
 d.index_first = loadedData.index_first;
@@ -116,12 +132,18 @@ if abs(loadedData.theta) > pi/4
 else
     d.theta = loadedData.theta;
 end
-guidata(es, d);
+guidata(f1, d);
 
 updateUI();
 
 calculationsAndPlotPath();
 
+end
+
+function loadDataCB(es,ed)
+
+loadData();
+  
 end
 
 function updateUI()
@@ -140,13 +162,19 @@ set(uiH.thetaDeg, 'value', (d.theta*180/pi));
 
 end
 
-function saveData(es,ed)
-global dropboxPath
+function saveData()
+global dropboxPath f1
 
-data = guidata(es);
+data = guidata(f1);
 
 saveAs = strcat(dropboxPath,'processedDataNew/',data.saveAs);
 save(saveAs,'-struct','data');
+
+end
+
+function saveDataCB(es,ed)
+
+saveData();
 
 end
 
@@ -318,9 +346,11 @@ title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %
 
 end
 
-function nextTest(es,ed)
+
+function nextTest()
 global numTests numUsers f1
-d = guidata(es);
+
+d = guidata(f1);
 
 if d.testNum < numTests
     testNumNext = d.testNum +1;
@@ -341,6 +371,12 @@ updateUI();
 
 %plot the path
 calculationsAndPlotPath();
+
+end
+
+function nextTestCB(es,ed)
+
+nextTest();
 
 end
 
