@@ -1,8 +1,8 @@
 function process_tango_data_excel()
-global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath num txt sp1 sp2 f1 uiH
+global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal dropboxPath num txt sp1 sp2 f1 uiH
 
-dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
-%dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
+%dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
+dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
 
 file = 'data-analysis-blind-users-20160524.xlsx';
 sheet = 1;
@@ -12,6 +12,41 @@ filePath = strcat(dropboxPath,file);
 % get data from excel spreadsheet
 tests = findTestData(dropboxPath,num,txt);
 numTests = sum(~cellfun('isempty',tests(1,:,1)));
+testCounter = 1;
+totalTestNum = numel(tests(:,:,4));
+testList = {};
+A = tests(:,:,4)';
+vA = reshape(A,[numel(A) 1]);
+U = tests(:,:,5)';
+vU = reshape(U,[numel(U) 1]);
+D = tests(:,:,7)';
+vD = reshape(D,[numel(D) 1]);
+M = tests(:,:,8)';
+vM = reshape(M,[numel(M) 1]);
+T = tests(:,:,1)';
+vT = reshape(T,[numel(T) 1]);
+for i=1:totalTestNum
+    el = vA(i);
+    el = el{1};
+    user = vU(i);
+    user = user{1};
+    device = vD(i);
+    device = device{1};
+    maze = vM(i);
+    maze = maze{1};
+    test = vT(i);
+    test = test{1};
+    if ~isempty(el)
+        mazeBox = strcmp(maze{1}(1:2),'mz') || strcmp(maze{1}(1:2),'bx');
+        if mazeBox
+            string = strcat(el, ' user',user, {' '},test,{' '},device, {' '},maze);
+            string = string{1};
+            testList{testCounter} = string;
+            testCounter = testCounter + 1;
+        end
+    end
+end
+numTestsTotal = testCounter - 1
 
 % define global variables
 mazeCol = 8;
@@ -83,6 +118,10 @@ uiH.load = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],
               'String','Load');
 uiH.load.Callback = @(es,ed) loadDataCB(es,ed);
 
+uiH.load = uicontrol('Parent',f1,'Style','popupmenu','String', testList,...
+                'Position',[550,120,60,23]);
+uiH.load.Callback = @(es,ed) switchTests(es,ed);
+
 % Labels
 uiH.shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
               'String','x_shift');
@@ -99,6 +138,15 @@ uiH.clipDataFirst_label = uicontrol('Parent',f1,'Style','text','Position',[35,20
 uiH.clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,60,23],...
               'String','clipEnd');
           
+end
+
+function switchTests(es,ed)
+ list = es.String;
+ value = es.Value;
+ test = list{value};
+ id = str2num(test(1:3));
+ 
+ 
 end
 
 function nextTestSaveAndLoadCB(es,ed)
