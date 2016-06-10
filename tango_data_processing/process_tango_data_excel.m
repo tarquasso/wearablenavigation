@@ -11,42 +11,42 @@ filePath = strcat(dropboxPath,file);
 
 % get data from excel spreadsheet
 tests = findTestData(dropboxPath,num,txt);
-numTests = sum(~cellfun('isempty',tests(1,:,1)));
+numTests = size(tests,1);
+%numTests = sum(~cellfun('isempty',tests(1,:,1)));
 testCounter = 1;
-totalTestNum = numel(tests(:,:,4));
 testList = {};
-A = tests(:,:,4)';
-vA = reshape(A,[numel(A) 1]);
-U = tests(:,:,5)';
-vU = reshape(U,[numel(U) 1]);
-D = tests(:,:,7)';
-vD = reshape(D,[numel(D) 1]);
-M = tests(:,:,8)';
-vM = reshape(M,[numel(M) 1]);
-T = tests(:,:,1)';
-vT = reshape(T,[numel(T) 1]);
-for i=1:totalTestNum
-    el = vA(i);
-    el = el{1};
-    user = vU(i);
+% A = tests(:,:,4)';
+% vA = reshape(A,[numel(A) 1]);
+% U = tests(:,:,5)';
+% vU = reshape(U,[numel(U) 1]);
+% D = tests(:,:,7)';
+% vD = reshape(D,[numel(D) 1]);
+% M = tests(:,:,8)';
+% vM = reshape(M,[numel(M) 1]);
+% T = tests(:,:,1)';
+% vT = reshape(T,[numel(T) 1]);
+for i=1:numTests
+    id = tests(i,4);
+    id = id{1};
+    user = tests(i,5);
     user = user{1};
-    device = vD(i);
+    device = tests(i,7);
     device = device{1};
-    maze = vM(i);
+    maze = tests(i,8);
     maze = maze{1};
-    test = vT(i);
+    test = tests(i,1);
     test = test{1};
-    if ~isempty(el)
+    if ~isempty(id)
         mazeBox = strcmp(maze{1}(1:2),'mz') || strcmp(maze{1}(1:2),'bx');
         if mazeBox
-            string = strcat(el, ' user',user, {' '},test,{' '},device, {' '},maze);
+            string = strcat(id, ' user',user, {' '},test,{' '},device, {' '},maze);
             string = string{1};
             testList{testCounter} = string;
             testCounter = testCounter + 1;
         end
     end
 end
-numTestsTotal = testCounter - 1
+numTestsTotal = testCounter - 1;
 
 % define global variables
 mazeCol = 8;
@@ -66,7 +66,12 @@ title('z axis data');
 sp2 = subplot('Position',[0.13 0.35 0.5 0.5]);
 axis equal
 
-data = processNextTrial(userNum,testNum);
+firstId = tests(1,4);
+firstId = str2num(firstId{1});
+
+data = processNextTrial(firstId);
+
+%data = processNextTrial(userNum,testNum);
 
 %store data into the gui
 guidata(f1, data);
@@ -119,7 +124,7 @@ uiH.load = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],
 uiH.load.Callback = @(es,ed) loadDataCB(es,ed);
 
 uiH.load = uicontrol('Parent',f1,'Style','popupmenu','String', testList,...
-                'Position',[550,120,60,23]);
+                'Position',[525,120,200,23]);
 uiH.load.Callback = @(es,ed) switchTests(es,ed);
 
 % Labels
@@ -140,15 +145,6 @@ uiH.clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,6
           
 end
 
-function switchTests(es,ed)
- list = es.String;
- value = es.Value;
- test = list{value};
- id = str2num(test(1:3));
- 
- 
-end
-
 function nextTestSaveAndLoadCB(es,ed)
 
 saveData();
@@ -166,6 +162,8 @@ loadFrom = strcat(dropboxPath,'processedData/',d.saveAs);
 try
 loadedData = load(loadFrom);
 catch
+    badTest = d.saveAs;
+    badTest
     warning('no data exists yet for this trial');
     return;
 end  
@@ -232,15 +230,6 @@ for i=2:length(x)
 end
 
 end
-
-% function chooseMaze(es,ax)
-%     data = guidata(es);
-%     mazeNum = es.Value - 1;
-%     data{12} = mazeNum;
-%     guidata(es, data);
-% 
-%     plotPath();
-% end
 
 function flattenData(es,ax,f1)
 % NOT TESTED YET
@@ -386,11 +375,32 @@ hold off;
 
 plot(sp1,d.z(d.index_first:d.index_last));
 
-title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n userNum = %02d testNum = %03d \n saveAs = %s', ...
-    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.userNum,d.testNum,d.saveAs));
+title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n saveAs = %s', ...
+    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.saveAs));
 
 end
 
+function switchTests(es,ed)
+global f1
+
+ list = es.String;
+ value = es.Value;
+ test = list{value};
+ id = str2num(test(1:3))
+ 
+ data = processNextTrial(id);
+
+ %store data into the gui
+ guidata(f1, data);
+
+ updateUI();
+
+ %plot the path
+ calculationsAndPlotPath();
+ 
+ loadData();
+ 
+end
 
 function nextTest()
 global numTests numUsers f1
@@ -425,16 +435,18 @@ nextTest();
 
 end
 
-function data = processNextTrial(userNum,testNum)
+function data = processNextTrial(id)
 global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH
 
 foundTest = 0;
-for i=userNum:numUsers
-    
-    for j=testNum:numTests
+for i=1:numTests
+    checkId = tests(i,4);
+    checkId = str2num(checkId{1});
+    if checkId == id
         %check that the test is a maze or a box
-        maze = tests(i,j,mazeCol);
-        maze = maze{1}{1};
+        theTest = tests(i,:);
+        maze = tests(i,mazeCol);
+        maze = maze{1}{1}
         if strcmp(maze(1:2),'mz') || strcmp(maze(1:2),'bx')
             if strcmp(maze(1:2),'bx')
                 mazeOrBox = 1;
@@ -442,16 +454,14 @@ for i=userNum:numUsers
                 mazeOrBox = 0;
             end
             %check that tango data exists
-            testName = tests(i,j,testNameCol);
+            testName = tests(i,testNameCol);
             testName = testName{1};
             if ~isnan(testName)
                 %if it does exist, proceed down
-                userFolder = tests{i,j,userFolderCol};
+                userFolder = tests{i,userFolderCol}
                 testName = num2str(testName);
                 path = strcat(dropboxPath,userFolder,testName,'/vio_rgb/');
                 foundTest = 1;
-                userNum = i;
-                testNum = j;
                 break;
             end
         end
@@ -459,10 +469,12 @@ for i=userNum:numUsers
     if foundTest
         % so leave the outer for loop
         break;
-    else
-        % iterate through the next user
-        testNum = 1;
     end
+end
+
+if ~foundTest
+    warning('the trial you selected does not have data apparently');
+    return;
 end
 
 fileString = ls(path);
@@ -503,14 +515,15 @@ mazeNum = str2double(maze(3));
 % plot(sp1,z);
 % plot(sp2,x,y,'LineWidth',2.5,'Color','b');
 
-testRun = tests{userNum,testNum,1};
-id = tests{userNum,testNum,4};
-user = tests{userNum,testNum,5};
-subj = tests{userNum,testNum,6};
-device = tests{userNum,testNum,7};
-maze = tests{userNum,testNum,8};
-saveAs = strcat(id,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
+testRun = theTest{1};
+testId = theTest{4};
+user = theTest{5};
+subj = theTest{6};
+device = theTest{7};
+maze = theTest{8};
+saveAs = strcat(testId,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
 saveAs = saveAs{1};
+userNum = str2num(user);
 
 data =struct();
 
@@ -529,10 +542,122 @@ data.mazeNum = mazeNum;
 data.z = z;
 data.orig_z = z; % stores the ORIGINAL z data
 data.userNum = userNum;
-data.testNum = testNum;
+data.testNum = testRun;
 data.mazeOrBox = mazeOrBox;
 % data.distance = distance;
 % data.total_time = total_time;
 % data.ave_velocity = ave_velocity;
 
 end
+
+% function data = processNextTrial(userNum,testNum)
+% global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH
+% 
+% foundTest = 0;
+% for i=userNum:numUsers
+%     
+%     for j=testNum:numTests
+%         %check that the test is a maze or a box
+%         maze = tests(i,j,mazeCol);
+%         maze = maze{1}{1};
+%         if strcmp(maze(1:2),'mz') || strcmp(maze(1:2),'bx')
+%             if strcmp(maze(1:2),'bx')
+%                 mazeOrBox = 1;
+%             else
+%                 mazeOrBox = 0;
+%             end
+%             %check that tango data exists
+%             testName = tests(i,j,testNameCol);
+%             testName = testName{1};
+%             if ~isnan(testName)
+%                 %if it does exist, proceed down
+%                 userFolder = tests{i,j,userFolderCol};
+%                 testName = num2str(testName);
+%                 path = strcat(dropboxPath,userFolder,testName,'/vio_rgb/');
+%                 foundTest = 1;
+%                 userNum = i;
+%                 testNum = j;
+%                 break;
+%             end
+%         end
+%     end
+%     if foundTest
+%         % so leave the outer for loop
+%         break;
+%     else
+%         % iterate through the next user
+%         testNum = 1;
+%     end
+% end
+% 
+% fileString = ls(path);
+% 
+% files = sort(strsplit(fileString,{'\t','\n','\0'},'CollapseDelimiters',true));
+% 
+% x = [];
+% y = [];
+% z = [];
+% t = [];
+% 
+% for i=3:length(files)
+%     fileString = strcat(path, files{i});
+%     if i == 3
+%         file = dlmread(fileString,',',3,0);
+%         tinit = file(1,11);
+%     else
+%         file = dlmread(fileString);
+%     end
+%     
+%     x = [x; file(:,1)];
+%     y = [y; file(:,2)];
+%     z = [z; file(:,3)];
+%     t = [t; file(:,11)-tinit];
+% end
+% 
+% % Initialize some values
+% x = x - x(1);
+% y = y - y(1);
+% 
+% index_first = 1;
+% index_last = length(x);
+% 
+% y_shift = 0;
+% x_shift = 0;
+% mazeNum = str2double(maze(3));
+% 
+% % plot(sp1,z);
+% % plot(sp2,x,y,'LineWidth',2.5,'Color','b');
+% 
+% testRun = tests{userNum,testNum,1};
+% id = tests{userNum,testNum,4};
+% user = tests{userNum,testNum,5};
+% subj = tests{userNum,testNum,6};
+% device = tests{userNum,testNum,7};
+% maze = tests{userNum,testNum,8};
+% saveAs = strcat(id,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
+% saveAs = saveAs{1};
+% 
+% data =struct();
+% 
+% data.x = x; % these are intended to store the ROTATED and TRANSLATED x, y data
+% data.y = y;
+% data.index_first = index_first;
+% data.index_last = index_last;
+% data.orig_x = x; % these are intended to store the ORIGINAL x, y data
+% data.orig_y = y;
+% data.theta = 0;
+% data.time = t;
+% data.y_shift = y_shift;
+% data.x_shift = x_shift;
+% data.saveAs = saveAs;
+% data.mazeNum = mazeNum;
+% data.z = z;
+% data.orig_z = z; % stores the ORIGINAL z data
+% data.userNum = userNum;
+% data.testNum = testNum;
+% data.mazeOrBox = mazeOrBox;
+% % data.distance = distance;
+% % data.total_time = total_time;
+% % data.ave_velocity = ave_velocity;
+% 
+% end

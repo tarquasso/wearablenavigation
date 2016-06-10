@@ -1,4 +1,4 @@
-function [ goodTests ] = findTestData(dropboxPath, num,txt )
+function [ bestTests ] = findTestData(dropboxPath, num,txt )
 
 %give this function data from an excel spreadsheet file
 %it will parse through the spreadsheet and find the
@@ -30,6 +30,8 @@ while row < numRows
     userFolder2 = strcat('user',user,' -',{' '}, year,month,day,'/',initials,'/tango/');
     userFolder2 = userFolder2{1};
     userFolder = strcat(userFolder1,userFolder2);
+    
+    %skip this set of data if the user folder does not exist
     skip = 0;
     try
         foldersString = ls(userFolder);
@@ -42,6 +44,9 @@ while row < numRows
         folders = sort(strsplit(foldersString,{'\t','\n','\0'},'CollapseDelimiters',true));
     end
 
+    %rowRange is the number of rows of test data that this user has
+    %even if you want to skip this user you need to know how many rows to
+    %skip
     isUser = num(row,1);
     rowRange = row;
     while ~isnan(isUser) && rowRange < numRows-1
@@ -54,6 +59,8 @@ while row < numRows
         tests = num(row:rowRange,7);
         tries = txt(row+2:rowRange+2,8);
         testNames = num(row:rowRange,14);
+        %sortedTests is just a cell array of the test data in the excel
+        %spreadsheet, regardless of whether or not the test is 'good'
         sortedTests = {};
         for i = 1:size(tests,1)
             catTest = strcat(sprintf('%02d',tests(i)),tries(i));
@@ -61,6 +68,8 @@ while row < numRows
             sortedTests{i,2} = testNames(i);
             sortedTests{i,3} = row - 1 + i;
         end
+        %you need to sort the tests to get the good data
+        %for example you want test 1c, not 1a
         sortedTests = sortrows(sortedTests,1);
 
         % use test names to find the successful/latest tests
@@ -71,6 +80,7 @@ while row < numRows
         for i = 1:size(sortedTests,1)-1
             gT = goodTests{userSection,ticker,1};
             sT = sortedTests{i+1,1};
+            testName = goodTests{userSection,ticker,2};
             if gT(2) == sT(2)
                 goodTests{userSection,ticker,1} = sortedTests{i+1,1};
                 goodTests{userSection,ticker,2} = sortedTests{i+1,2};
@@ -103,6 +113,22 @@ while row < numRows
     end
 
     row = rowRange + 2;
+end
+
+numTests = size(goodTests,1)*size(goodTests,2);
+ticker = 1;
+bestTests = {};
+for i = 1:size(goodTests,1)
+    for j = 1:size(goodTests,2)
+        testName = goodTests(i,j,2);
+        if ~isnan(testName{1})
+            for k=1:9
+                databit = goodTests(i,j,k);
+                bestTests{ticker,k} = databit{1};
+            end
+            ticker = ticker + 1;
+        end
+    end
 end
 
 end
