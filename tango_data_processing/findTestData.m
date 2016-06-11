@@ -101,6 +101,7 @@ while row < numRows
             testRun = goodTests{userSection,i,1};
             device = txt(testRow+2,9);
             maze = txt(testRow+2,10);
+            video = num(testRow,12);
 
             goodTests{userSection,i,4} = id;
             goodTests{userSection,i,5} = user;
@@ -108,6 +109,7 @@ while row < numRows
             goodTests{userSection,i,7} = device;
             goodTests{userSection,i,8} = maze;
             goodTests{userSection,i,9} = userFolder2;
+            goodTests{userSection,i,10} = video;
         end
         userSection = userSection + 1;
     end
@@ -122,7 +124,7 @@ for i = 1:size(goodTests,1)
     for j = 1:size(goodTests,2)
         testName = goodTests(i,j,2);
         if ~isnan(testName{1})
-            for k=1:9
+            for k=1:10
                 databit = goodTests(i,j,k);
                 bestTests{ticker,k} = databit{1};
             end

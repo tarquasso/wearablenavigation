@@ -119,7 +119,6 @@ uiH.nextTest = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,180,17
               'String','Next Test (Save and Load)-->');
 uiH.nextTest.Callback = @(es,ed) nextTestSaveAndLoadCB(es,ed);
 
-
 uiH.load = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,80,60,23],...
               'String','Load');
 uiH.load.Callback = @(es,ed) loadDataCB(es,ed);
@@ -127,6 +126,10 @@ uiH.load.Callback = @(es,ed) loadDataCB(es,ed);
 uiH.load = uicontrol('Parent',f1,'Style','popupmenu','String', testList,...
                 'Position',[525,120,200,23]);
 uiH.load.Callback = @(es,ed) switchTests(es,ed);
+
+uiH.playVideo = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,260,170,23],...
+              'String','Play Video');
+uiH.playVideo.Callback = @(es,ed) playVideo(es,ed);
 
 % Labels
 uiH.shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
@@ -144,6 +147,38 @@ uiH.clipDataFirst_label = uicontrol('Parent',f1,'Style','text','Position',[35,20
 uiH.clipDataLast_label = uicontrol('Parent',f1,'Style','text','Position',[35,0,60,23],...
               'String','clipEnd');
           
+end
+
+function playVideo(es,ed)
+
+global dropboxPath
+
+d = guidata(es);
+video = d.video;
+userFolder = d.userFolder;
+
+videoPath = strcat(dropboxPath, userFolder(1:end-6),'video/');
+files = ls(videoPath);
+
+videos = sort(strsplit(files,{'\t','\n','\0'},'CollapseDelimiters',true));
+videos = videos(2:end);
+
+videoFile = '';
+for i = 1:size(videos,2)
+    if ~isempty(strfind(videos(i),num2str(video)))
+        v = videos(i);
+        v = v{1};
+        videoFile = strcat(videoPath,v);
+        break;
+    end
+end
+
+if strcmp(videoFile,'')
+    warning('the video for this test cannot be found');
+else
+    implay(videoFile)
+end
+
 end
 
 function nextTestSaveAndLoadCB(es,ed)
@@ -426,33 +461,6 @@ calculationsAndPlotPath();
 
 end
 
-% function nextTest()
-% global numTests numUsers f1 testRow
-% 
-% d = guidata(f1);
-% 
-% if d.testNum < numTests
-%     testNumNext = d.testNum +1;
-%     userNumNext = d.userNum;
-% elseif d.userNum < numUsers
-%     userNumNext = d.userNum +1;
-%     testNumNext = d.testNum;
-% else
-%     return;    
-% end
-% 
-% data = processNextTrial(userNumNext,testNumNext);
-% 
-% %store data into the gui
-% guidata(f1, data);
-% 
-% updateUI();
-% 
-% %plot the path
-% calculationsAndPlotPath();
-% 
-% end
-
 function nextTestCB(es,ed)
 
 nextTest();
@@ -539,13 +547,15 @@ mazeNum = str2double(maze(3));
 
 % plot(sp1,z);
 % plot(sp2,x,y,'LineWidth',2.5,'Color','b');
-
 testRun = theTest{1};
 testId = theTest{4};
 user = theTest{5};
 subj = theTest{6};
 device = theTest{7};
 maze = theTest{8};
+userFolder = theTest{9};
+video = theTest{10};
+video = video(1);
 saveAs = strcat(testId,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
 saveAs = saveAs{1};
 userNum = str2num(user);
@@ -570,6 +580,8 @@ data.userNum = userNum;
 data.testNum = testRun;
 data.mazeOrBox = mazeOrBox;
 data.id = id;
+data.video = video;
+data.userFolder = userFolder;
 % data.distance = distance;
 % data.total_time = total_time;
 % data.ave_velocity = ave_velocity;
