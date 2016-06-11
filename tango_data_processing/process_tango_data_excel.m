@@ -176,7 +176,11 @@ end
 if strcmp(videoFile,'')
     warning('the video for this test cannot be found');
 else
-    implay(videoFile)
+    osCommand = strcat('open',' ''',videoFile,'''');
+    tryToPlay = system(osCommand);
+    if ~tryToPlay
+        implay(videoFile);
+    end
 end
 
 end
