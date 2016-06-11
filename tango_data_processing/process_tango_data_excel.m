@@ -1,5 +1,5 @@
 function process_tango_data_excel()
-global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal dropboxPath num txt sp1 sp2 f1 uiH
+global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal dropboxPath num txt sp1 sp2 f1 uiH testRow
 
 %dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
 dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
@@ -8,6 +8,7 @@ file = 'data-analysis-blind-users-20160524.xlsx';
 sheet = 1;
 filePath = strcat(dropboxPath,file);
 [num,txt,~] = xlsread(filePath,sheet);
+testRow = 1;
 
 % get data from excel spreadsheet
 tests = findTestData(dropboxPath,num,txt);
@@ -403,21 +404,17 @@ global f1
 end
 
 function nextTest()
-global numTests numUsers f1
+global numTests numUsers f1 testRow tests
 
-d = guidata(f1);
-
-if d.testNum < numTests
-    testNumNext = d.testNum +1;
-    userNumNext = d.userNum;
-elseif d.userNum < numUsers
-    userNumNext = d.userNum +1;
-    testNumNext = d.testNum;
+if testRow < numTests
+    id = tests(testRow + 1,4);
+    id = str2num(id{1});
+    data = processNextTrial(id);
 else
-    return;    
+    id = tests(1,4);
+    id = str2num(id{1});
+    data = processNextTrial(id);
 end
-
-data = processNextTrial(userNumNext,testNumNext);
 
 %store data into the gui
 guidata(f1, data);
@@ -429,6 +426,33 @@ calculationsAndPlotPath();
 
 end
 
+% function nextTest()
+% global numTests numUsers f1 testRow
+% 
+% d = guidata(f1);
+% 
+% if d.testNum < numTests
+%     testNumNext = d.testNum +1;
+%     userNumNext = d.userNum;
+% elseif d.userNum < numUsers
+%     userNumNext = d.userNum +1;
+%     testNumNext = d.testNum;
+% else
+%     return;    
+% end
+% 
+% data = processNextTrial(userNumNext,testNumNext);
+% 
+% %store data into the gui
+% guidata(f1, data);
+% 
+% updateUI();
+% 
+% %plot the path
+% calculationsAndPlotPath();
+% 
+% end
+
 function nextTestCB(es,ed)
 
 nextTest();
@@ -436,7 +460,7 @@ nextTest();
 end
 
 function data = processNextTrial(id)
-global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH
+global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH testRow
 
 foundTest = 0;
 for i=1:numTests
@@ -462,6 +486,7 @@ for i=1:numTests
                 testName = num2str(testName);
                 path = strcat(dropboxPath,userFolder,testName,'/vio_rgb/');
                 foundTest = 1;
+                testRow = i;
                 break;
             end
         end
@@ -544,6 +569,7 @@ data.orig_z = z; % stores the ORIGINAL z data
 data.userNum = userNum;
 data.testNum = testRun;
 data.mazeOrBox = mazeOrBox;
+data.id = id;
 % data.distance = distance;
 % data.total_time = total_time;
 % data.ave_velocity = ave_velocity;
