@@ -2,7 +2,7 @@ function process_tango_data_excel()
 global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal dropboxPath num txt sp1 sp2 f1 uiH testRow
 
 % FILL IN YOUR computer username here:
-editorNames = {'rkk', 'brandonaraki_backup'};
+editorNames = {'rkk', 'brandonaraki'};
 
 dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
     '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
