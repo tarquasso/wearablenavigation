@@ -22,12 +22,22 @@ filename = 'data-analysis-blind-users-20160524_with_tango.mat';
 matFileToOpen = strcat(dropboxPath,filename);
 load(matFileToOpen);
 
-% file of interest is data, dataheader
-deviceColName = 'device';
-[~,deviceCol,~] = find(strcmp(dataheader,deviceColName));
 
-taskColName = 'task_';
-[~,taskCol,~] = find(strcmp(dataheader,taskColName));
+% file of interest is data, dataheader
+
+[~,usefulCol,~] = find(strcmp(dataheader,'useful'));
+
+[~,idCol,~] = find(strcmp(dataheader,'id'));
+
+[~,deviceCol,~] = find(strcmp(dataheader,'device'));
+
+containsUsefulData = cell2mat(data(:,usefulCol));
+
+containsCane = strcmp(data(:,deviceCol),'cane') & containsUsefulData;
+containsBelt = strcmp(data(:,deviceCol),'belt') & containsUsefulData;
+
+
+[~,taskCol,~] = find(strcmp(dataheader,'task_'));
 [~,vidDurCol,~] = find(strcmp(dataheader,'VideoDuration_s_'));
 [~,totTimCol,~] = find(strcmp(dataheader,'total_time'));
 [~,aveVelCol,~] = find(strcmp(dataheader,'ave_velocity'));
@@ -37,41 +47,49 @@ taskColName = 'task_';
 
 datacompiled = struct();
 
-for ii = 1:4
-[caneRows,~,~] = find(strcmp(data(:,deviceCol),'cane'));
 
+
+for ii = 1:4
 mazeName = ['mz' num2str(ii)];
-[mzCaneRows,~,~] = find(strcmp(data(caneRows,taskCol),mazeName));
+
+containsThisMaze = strcmp(data(:,taskCol),mazeName);
+[mzCaneRows,~,~] = find( containsCane & containsThisMaze);
+datacompiled.cane.maze{ii}.id = cell2mat(data(mzCaneRows,idCol));
 datacompiled.cane.maze{ii}.durationVideo = cell2mat(data(mzCaneRows,vidDurCol));
 datacompiled.cane.maze{ii}.durationTango = cell2mat(data(mzCaneRows,totTimCol));
 
 figure(ii)
-plot(datacompiled.cane.maze{ii}.durationVideo)
+plot(datacompiled.cane.maze{ii}.id,datacompiled.cane.maze{ii}.durationVideo,'*')
 hold on
-plot(datacompiled.cane.maze{ii}.durationTango,'-.')
+plot(datacompiled.cane.maze{ii}.id,datacompiled.cane.maze{ii}.durationTango,'o')
+legend('duration video','duration tango');
 
 title(['cane ' ,mazeName])
+datacompiled.cane.maze{ii}.averageVelocity = cell2mat(data(mzCaneRows,aveVelCol));
+datacompiled.cane.maze{ii}.wallTaps = cell2mat(data(mzCaneRows,wallTapsCol));
 
-datacompiled.cane.maze{ii}.averageVelocity = data(mzCaneRows,aveVelCol);
-datacompiled.cane.maze{ii}.wallTaps = data(mzCaneRows,wallTapsCol);
+%BELT MAZE
 
-[beltRows,~,~] = find(strcmp(data(:,deviceCol),'belt'));
-[mzBeltRows,~,~] = find(strcmp(data(beltRows,taskCol),mazeName));
+[mzBeltRows,~,~] = find( containsBelt & containsThisMaze);
+datacompiled.belt.maze{ii}.id = cell2mat(data(mzBeltRows,idCol));
+
 datacompiled.belt.maze{ii}.durationVideo = cell2mat(data(mzBeltRows,vidDurCol));
 datacompiled.belt.maze{ii}.durationTango = cell2mat(data(mzBeltRows,totTimCol));
-datacompiled.belt.maze{ii}.averageVelocity = data(mzBeltRows,aveVelCol);
-datacompiled.belt.maze{ii}.majorColl = data(mzCaneRows,majCollCol);
+datacompiled.belt.maze{ii}.averageVelocity = cell2mat(data(mzBeltRows,aveVelCol));
+datacompiled.belt.maze{ii}.majorColl = cell2mat(data(mzBeltRows,majCollCol));
 
 figure(4+ii)
-plot(datacompiled.belt.maze{ii}.durationVideo)
+plot(datacompiled.belt.maze{ii}.id,datacompiled.belt.maze{ii}.durationVideo,'*')
 hold on
-plot(datacompiled.belt.maze{ii}.durationTango,'-.')
-
+plot(datacompiled.belt.maze{ii}.id,datacompiled.belt.maze{ii}.durationTango,'o')
+legend('duration video','duration tango');
 title(['belt ' ,mazeName])
 
 
 boxName = ['bx' num2str(ii)];
-[bxBeltRows,~,~] = find(strcmp(data(beltRows,taskCol),boxName));
+containsThisBox = strcmp(data(:,taskCol),boxName);
+
+[bxBeltRows,~,~] = find( containsBelt & containsThisBox);
 datacompiled.belt.box{ii}.durationVideo = data(bxBeltRows,vidDurCol);
 datacompiled.belt.box{ii}.durationTango = data(bxBeltRows,totTimCol);
 datacompiled.belt.box{ii}.averageVelocity = data(bxBeltRows,aveVelCol);
