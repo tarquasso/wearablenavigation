@@ -5,8 +5,21 @@
 % infos into a separate folder called ProcessedDataFixed/
 
 %% EDIT FILE NAMES BELOW IF NEEDED
-dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
-%dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
+
+% FILL IN YOUR computer username here:
+editorNames = {'rkk', 'brandonaraki'};
+
+dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
+    '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
+
+osUserName = char(java.lang.System.getProperty('user.name'));
+
+for k = 1:length(editorNames)
+    curName = editorNames{k};
+  if strcmp (osUserName,curName)
+      dropboxPath = dropboxPathOptions{k};
+  end
+end
 
 fileIn = 'data-analysis-blind-users-20160524.xlsx';
 
