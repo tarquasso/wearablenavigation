@@ -1,8 +1,8 @@
 function process_tango_data_excel()
 global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal dropboxPath num txt sp1 sp2 f1 uiH testRow
 
-%dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
-dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
+dropboxPath = '~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/';
+%dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
 
 file = 'data-analysis-blind-users-20160524.xlsx';
 sheet = 1;
@@ -415,8 +415,8 @@ hold off;
 
 plot(sp1,d.z(d.index_first:d.index_last));
 
-title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n saveAs = %s', ...
-    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.saveAs));
+title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n saveAs = %s \n video = %d', ...
+    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.saveAs,d.video));
 
 end
 
