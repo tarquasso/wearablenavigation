@@ -4,7 +4,7 @@ global tests mazeCol testNameCol userFolderCol numUsers numTests numTestsTotal d
 % FILL IN YOUR computer username here:
 editorNames = {'rkk', 'brandonaraki'};
 
-dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
+dropboxPathOptions = {'/Users/rkk/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
     '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
 
 osUserName = char(java.lang.System.getProperty('user.name'));
@@ -190,7 +190,7 @@ if strcmp(videoFile,'')
 else
     osCommand = strcat('open',' ''',videoFile,'''');
     tryToPlay = system(osCommand);
-    if ~tryToPlay
+    if tryToPlay
         implay(videoFile);
     end
 end
@@ -219,13 +219,13 @@ catch
     warning('no data exists yet for this trial');
     return;
 end  
-%% TODO update uicontrol
-
+% only gui variable data gets overwritten
 d.index_first = loadedData.index_first;
 d.index_last = loadedData.index_last;
 d.x_shift = loadedData.x_shift;
 d.y_shift = loadedData.y_shift;
 d.theta = loadedData.theta;
+% save to the gui
 guidata(f1, d);
 
 updateUI();
@@ -598,6 +598,17 @@ data.mazeOrBox = mazeOrBox;
 data.id = id;
 data.video = video;
 data.userFolder = userFolder;
+% data.wallTapsAct = 
+% data.majCollAct = 
+% data.minCollAct = 
+% data.sumCollAct = 
+% if mazeOrBox = 0
+%     % data.boxSuccess =  1 for success, 0 for not relevant -1 for failure
+% else
+%     do nothing
+% end
+% The following is commented out b/c it is written during each
+% calculateandplotting step:
 % data.distance = distance;
 % data.total_time = total_time;
 % data.ave_velocity = ave_velocity;

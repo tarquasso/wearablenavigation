@@ -67,7 +67,7 @@ if ~all(~mod(idVector,1))
     error('id numbers have to all be integers!')
 end
 
-%%
+%% check for unique id numbers
 
 %check if the id numbers are unique
 [n, bin] = histc(idVector, unique(idVector));
