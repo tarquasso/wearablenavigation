@@ -143,6 +143,10 @@ uiH.playVideo = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,260,1
               'String','Play Video');
 uiH.playVideo.Callback = @(es,ed) playVideo(es,ed);
 
+uiH.flipXData = uicontrol('Parent',f1,'Style','pushbutton','Position',[550,300,70,23],...
+              'String','Flip X Data');
+uiH.flipXData.Callback = @(es,ed) flipXData(es,ed);
+
 % Labels
 uiH.shiftX_label = uicontrol('Parent',f1,'Style','text','Position',[40,80,50,23],...
               'String','x_shift');
@@ -227,6 +231,11 @@ d.index_last = loadedData.index_last;
 d.x_shift = loadedData.x_shift;
 d.y_shift = loadedData.y_shift;
 d.theta = loadedData.theta;
+try
+    d.flipX = loadedData.flipX;
+catch
+    d.flipX = 1;
+end
 % save to the gui
 guidata(f1, d);
 
@@ -324,6 +333,7 @@ function flattenData(es,ax,f1)
     calculationsAndPlotPath();
 
 end
+
 function [xrot,yrot] = rotateData(xorig,yorig,thetaRad)
 
 %angle input in radian
@@ -343,6 +353,16 @@ data = guidata(es);
 data.theta = es.Value;
 
 guidata(es, data);
+
+calculationsAndPlotPath();
+
+end
+
+function flipXData(es,ed)
+
+d = guidata(es);
+d.flipX = -d.flipX;
+guidata(es,d);
 
 calculationsAndPlotPath();
 
@@ -412,6 +432,13 @@ yNotRotated = yorig - yorig(d.index_first);
 thetaRad = d.theta*pi/180;
 %rotate data
 [d.x,d.y] = rotateData(xNotRotated,yNotRotated,thetaRad);
+try
+    flipX = d.flipX;
+catch
+    flipX = 1;
+    d.flipX = 1;
+end
+d.x = d.flipX * d.x;
 
 guidata(f1,d);
 
@@ -617,115 +644,3 @@ data.boxSuccess = boxSuccess;
 % data.ave_velocity = ave_velocity;
 
 end
-
-% function data = processNextTrial(userNum,testNum)
-% global tests mazeCol testNameCol userFolderCol numUsers numTests dropboxPath uiH
-% 
-% foundTest = 0;
-% for i=userNum:numUsers
-%     
-%     for j=testNum:numTests
-%         %check that the test is a maze or a box
-%         maze = tests(i,j,mazeCol);
-%         maze = maze{1}{1};
-%         if strcmp(maze(1:2),'mz') || strcmp(maze(1:2),'bx')
-%             if strcmp(maze(1:2),'bx')
-%                 mazeOrBox = 1;
-%             else
-%                 mazeOrBox = 0;
-%             end
-%             %check that tango data exists
-%             testName = tests(i,j,testNameCol);
-%             testName = testName{1};
-%             if ~isnan(testName)
-%                 %if it does exist, proceed down
-%                 userFolder = tests{i,j,userFolderCol};
-%                 testName = num2str(testName);
-%                 path = strcat(dropboxPath,userFolder,testName,'/vio_rgb/');
-%                 foundTest = 1;
-%                 userNum = i;
-%                 testNum = j;
-%                 break;
-%             end
-%         end
-%     end
-%     if foundTest
-%         % so leave the outer for loop
-%         break;
-%     else
-%         % iterate through the next user
-%         testNum = 1;
-%     end
-% end
-% 
-% fileString = ls(path);
-% 
-% files = sort(strsplit(fileString,{'\t','\n','\0'},'CollapseDelimiters',true));
-% 
-% x = [];
-% y = [];
-% z = [];
-% t = [];
-% 
-% for i=3:length(files)
-%     fileString = strcat(path, files{i});
-%     if i == 3
-%         file = dlmread(fileString,',',3,0);
-%         tinit = file(1,11);
-%     else
-%         file = dlmread(fileString);
-%     end
-%     
-%     x = [x; file(:,1)];
-%     y = [y; file(:,2)];
-%     z = [z; file(:,3)];
-%     t = [t; file(:,11)-tinit];
-% end
-% 
-% % Initialize some values
-% x = x - x(1);
-% y = y - y(1);
-% 
-% index_first = 1;
-% index_last = length(x);
-% 
-% y_shift = 0;
-% x_shift = 0;
-% mazeNum = str2double(maze(3));
-% 
-% % plot(sp1,z);
-% % plot(sp2,x,y,'LineWidth',2.5,'Color','b');
-% 
-% testRun = tests{userNum,testNum,1};
-% id = tests{userNum,testNum,4};
-% user = tests{userNum,testNum,5};
-% subj = tests{userNum,testNum,6};
-% device = tests{userNum,testNum,7};
-% maze = tests{userNum,testNum,8};
-% saveAs = strcat(id,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
-% saveAs = saveAs{1};
-% 
-% data =struct();
-% 
-% data.x = x; % these are intended to store the ROTATED and TRANSLATED x, y data
-% data.y = y;
-% data.index_first = index_first;
-% data.index_last = index_last;
-% data.orig_x = x; % these are intended to store the ORIGINAL x, y data
-% data.orig_y = y;
-% data.theta = 0;
-% data.time = t;
-% data.y_shift = y_shift;
-% data.x_shift = x_shift;
-% data.saveAs = saveAs;
-% data.mazeNum = mazeNum;
-% data.z = z;
-% data.orig_z = z; % stores the ORIGINAL z data
-% data.userNum = userNum;
-% data.testNum = testNum;
-% data.mazeOrBox = mazeOrBox;
-% % data.distance = distance;
-% % data.total_time = total_time;
-% % data.ave_velocity = ave_velocity;
-% 
-% end
