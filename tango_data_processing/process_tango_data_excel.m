@@ -177,7 +177,9 @@ videos = videos(2:end);
 
 videoFile = '';
 for i = 1:size(videos,2)
-    if ~isempty(strfind(videos(i),num2str(video)))
+    containsString = strfind(videos(i),num2str(video));
+    containsString = containsString{1};
+    if ~isempty(containsString)
         v = videos(i);
         v = v{1};
         videoFile = strcat(videoPath,v);
@@ -427,8 +429,8 @@ hold off;
 
 plot(sp1,d.z(d.index_first:d.index_last));
 
-title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n saveAs = %s \n video = %d', ...
-    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.saveAs,d.video));
+title(sprintf('degrees = %.3f | first index = %d | last index = %d | x shift = %0.3f | y shift = %0.3f \n time = %0.3f | distance = %0.3f | mazeNum = %d \n saveAs = %s \n video = %d wallTaps = %d majColl = %d minColl = %d sumColl = %d', ...
+    d.theta,d.index_first,d.index_last,d.x_shift,d.y_shift,d.total_time,d.distance,d.mazeNum,d.saveAs,d.video,d.wallTapsAct,d.majCollAct,d.minCollAct,d.sumCollAct));
 
 end
 
@@ -575,6 +577,11 @@ video = video(1);
 saveAs = strcat(testId,' user',user,{' '},subj,{' '},testRun,{' '},device,{' '},maze,'.mat');
 saveAs = saveAs{1};
 userNum = str2num(user);
+wallTaps = theTest{11};
+majCollAct = theTest{12};
+minCollAct = theTest{13};
+sumCollAct = theTest{14};
+boxSuccess = theTest{15};
 
 data =struct();
 
@@ -598,15 +605,11 @@ data.mazeOrBox = mazeOrBox;
 data.id = id;
 data.video = video;
 data.userFolder = userFolder;
-% data.wallTapsAct = 
-% data.majCollAct = 
-% data.minCollAct = 
-% data.sumCollAct = 
-% if mazeOrBox = 0
-%     % data.boxSuccess =  1 for success, 0 for not relevant -1 for failure
-% else
-%     do nothing
-% end
+data.wallTapsAct = wallTaps;
+data.majCollAct = majCollAct;
+data.minCollAct = minCollAct;
+data.sumCollAct = sumCollAct;
+data.boxSuccess = boxSuccess;
 % The following is commented out b/c it is written during each
 % calculateandplotting step:
 % data.distance = distance;
