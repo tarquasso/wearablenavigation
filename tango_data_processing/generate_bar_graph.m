@@ -186,7 +186,7 @@ set(gca,'Xtick',1:numOfMazes*5+numOfMazes,'XTickLabel',specs,'XTickLabelRotation
 
 
 %% Third Bar Graph With Subplots
-hFig = figure(12)
+hFig = figure(12);
 set(hFig, 'Position', [30 60 1800 1024])
 
 specs1 = {};
