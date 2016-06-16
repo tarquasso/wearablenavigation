@@ -53,7 +53,10 @@ containsBelt = strcmp(data(:,deviceCol),'belt') & containsUsefulData;
 % set up the compiled data
 dc = struct();
 
-for ii = 1:4
+% get screen size
+screensize = get( groot, 'Screensize' );
+numOfMazes = 4;
+for ii = 1:numOfMazes
 mazeName = ['mz' num2str(ii)];
 
 %CANE MAZE
@@ -67,7 +70,9 @@ dc.cane.maze{ii}.averageVelocity.raw = cell2mat(data(mzCaneRows,aveVelCol));
 dc.cane.maze{ii}.wallTaps.raw = cell2mat(data(mzCaneRows,wallTapsCol));
 dc.cane.maze{ii}.distance.raw = cell2mat(data(mzCaneRows,distCol));
 
-figure(ii)
+hfig{ii} = figure(ii);
+set(hfig{ii}, 'Position', [((ii-1)*screensize(3)/numOfMazes) 0 screensize(3)/numOfMazes screensize(4)/2])
+
 plot(dc.cane.maze{ii}.id,dc.cane.maze{ii}.durationVideo.raw,'*')
 hold on
 plot(dc.cane.maze{ii}.id,dc.cane.maze{ii}.durationTango.raw,'o')
@@ -103,7 +108,9 @@ dc.belt.maze{ii}.majorColl.raw = cell2mat(data(mzBeltRows,majCollCol));
 dc.belt.maze{ii}.distance.raw = cell2mat(data(mzBeltRows,distCol));
 
 
-figure(4+ii)
+hfig{4+ii}= figure(4+ii);
+set(hfig{4+ii}, 'Position', [((ii-1)*screensize(3)/numOfMazes) screensize(4)/2 screensize(3)/numOfMazes screensize(4)/2])
+
 plot(dc.belt.maze{ii}.id,dc.belt.maze{ii}.durationVideo.raw,'*')
 hold on
 plot(dc.belt.maze{ii}.id,dc.belt.maze{ii}.durationTango.raw,'o')
