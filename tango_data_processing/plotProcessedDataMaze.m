@@ -59,7 +59,13 @@ for i=1:numTests
 
     
     wallTaps = num(id1,wallTapCol);
+    if isnan(wallTaps)
+        wallTaps = 0;
+    end
     collisions = num(id2,collisionCol);
+    if isnan(collisions)
+        collisions = 0;
+    end
     
     subplot(4,2*numTests,[1 2 1+2*numTests 2+2*numTests]+2*(i-1));
     hold on
