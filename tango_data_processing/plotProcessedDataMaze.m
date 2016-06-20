@@ -1,4 +1,17 @@
-dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
+% FILL IN YOUR computer username here:
+editorNames = {'rkk', 'brandonaraki'};
+
+dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
+    '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
+
+osUserName = char(java.lang.System.getProperty('user.name'));
+
+for k = 1:length(editorNames)
+    curName = editorNames{k};
+  if strcmp (osUserName,curName)
+      dropboxPath = dropboxPathOptions{k};
+  end
+end
 
 tests = {{'015 user02 AC 01b cane mz1','020 user02 AC 05a belt mz1'},{'016 user02 AC 02a cane mz2','019 user02 AC 04a belt mz2'},{'018 user02 AC 03b cane mz3','021 user02 AC 06a belt mz3'},{'030 user02 AC 12a cane mz4','023 user02 AC 07b belt mz4'}};
 numTests = numel(tests);
