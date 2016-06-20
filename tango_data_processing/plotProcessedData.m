@@ -91,8 +91,8 @@ set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
 
 subplot(4,2,8)
 hold on;
-bar(1, [wallTaps 0], 'facecolor', 'b');
-bar(2, [collisions 10], 'facecolor', 'r');
+bar(1,wallTaps, 'facecolor', 'b');
+bar(2, collisions, 'facecolor', 'r');
 hold off;
 ylabel('wall taps / collisions')
 set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
