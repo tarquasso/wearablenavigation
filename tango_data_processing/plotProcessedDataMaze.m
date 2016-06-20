@@ -32,6 +32,7 @@ for i=1:numTests
     load(path);
     saveAs1 = test1;
     id1 = str2num(saveAs1(1:3));
+    id1 = find(num(:,1)==id1);
     x1 = x;
     x_shift1 = x_shift;
     y1 = y;
@@ -54,6 +55,7 @@ for i=1:numTests
 
     saveAs2 = test2;
     id2 = str2num(saveAs2(1:3));
+    id2 = find(num(:,1)==id2);
     x2 = x;
     x_shift2 = x_shift;
     y2 = y;
