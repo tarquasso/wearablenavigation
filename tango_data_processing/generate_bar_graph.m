@@ -204,10 +204,22 @@ specs1 = {};
 specs2 = {};
 specs3 = {};
 
+dc.belt.mazesAll.duration.raw = zeros(numOfMazes,1);
+dc.cane.mazesAll.duration.raw = zeros(numOfMazes,1);
+
+dc.belt.mazesAll.majorColl.raw = zeros(numOfMazes,1);
+dc.cane.mazesAll.wallTaps.raw = zeros(numOfMazes,1);
+
+dc.belt.mazesAll.distance.raw = zeros(numOfMazes,1);
+dc.cane.mazesAll.distance.raw = zeros(numOfMazes,1);
+
+
 titleFontSize = 20;
 xaxisFontSize = 15;
 axisRotation = 45;
 offset = 33;
+
+
 for ii = numOfMazes:-1:1
 
 sp1 = subplot(1,3,1);
@@ -224,6 +236,9 @@ specs1 = horzcat(['HW ' num2str(ii) ' Belt Duration'],['HW ' num2str(ii) ' Cane 
 title('Durations','FontSize',titleFontSize)
 
 set(gca,'Xtick',offset+1:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs1,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
+
+dc.belt.mazesAll.durationTango.raw(ii) = dc.belt.maze{ii}.durationTango.mean;
+dc.cane.mazesAll.durationTango.raw(ii) = dc.cane.maze{ii}.durationTango.mean;
 
 
 %ylim([-3 inf]) % or your lower limit.
@@ -260,6 +275,10 @@ specs2 = horzcat(['HW ' num2str(ii) ' Belt Major Collisions'],['HW ' num2str(ii)
 title('Collisions and Taps','FontSize',titleFontSize)
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
+dc.belt.mazesAll.majorColl.raw(ii) = dc.belt.maze{ii}.majorColl.mean;
+dc.cane.mazesAll.wallTaps.raw(ii) = dc.cane.maze{ii}.wallTaps.mean;
+
+
 sp3 = subplot(1,3,3);
 xlim(sp3,[offset 3*numOfMazes+offset])
 bar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
@@ -274,11 +293,54 @@ specs3 = horzcat(['HW ' num2str(ii) ' Belt Avg Distance' ],['HW ' num2str(ii) ' 
 
 title('Distances','FontSize',titleFontSize)
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
-% 
-% xlhand = get(gca,'xlabel')
-% set(xlhand,'string','X','fontsize',20)
+
+dc.belt.mazesAll.distance.raw(ii) = dc.belt.maze{ii}.distance.mean;
+dc.cane.mazesAll.distance.raw(ii) = dc.cane.maze{ii}.distance.mean;
+
 
 end
+
+hFig = figure(13);
+set(hFig, 'Position', [30 60 1800 1024])
+
+% find overall means
+dc.belt.mazesAll.durationTango.mean = mean(dc.belt.mazesAll.durationTango.raw);
+beltDur = dc.belt.mazesAll.durationTango.mean
+
+dc.cane.mazesAll.durationTango.mean = mean(dc.cane.mazesAll.durationTango.raw);
+caneDur = dc.cane.mazesAll.durationTango.mean
+dc.belt.mazesAll.durationTango.compared = 1-(dc.cane.mazesAll.durationTango.mean/dc.belt.mazesAll.durationTango.mean);
+
+dc.belt.mazesAll.majorColl.mean = mean(dc.belt.mazesAll.majorColl.raw);
+beltCol = dc.belt.mazesAll.majorColl.mean
+dc.cane.mazesAll.wallTaps.mean = mean(dc.cane.mazesAll.wallTaps.raw);
+caneTaps = dc.cane.mazesAll.wallTaps.mean
+
+dc.belt.mazesAll.majorColl.compared = 1-(dc.belt.mazesAll.majorColl.mean/dc.cane.mazesAll.wallTaps.mean);
+
+dc.belt.mazesAll.distance.mean = mean(dc.belt.mazesAll.distance.raw);
+beltDist = dc.belt.mazesAll.distance.mean
+dc.cane.mazesAll.distance.mean = mean(dc.cane.mazesAll.distance.raw);
+caneDist = dc.cane.mazesAll.distance.mean
+dc.belt.mazesAll.distance.compared = 1-(dc.cane.mazesAll.distance.mean/dc.belt.mazesAll.distance.mean);
+
+%xlim(hFig,[offset 3*numOfMazes+offset])
+
+bar(1+offset,dc.belt.mazesAll.durationTango.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+hold on;
+bar(2+offset,dc.cane.mazesAll.durationTango.mean,'FaceColor',hsv2rgb([0 0.4 1]),'EdgeColor',hsv2rgb([0 0.4 1]),'LineWidth',1.5);
+
+bar(3+offset,dc.belt.mazesAll.majorColl.mean,'FaceColor',hsv2rgb([0.3 1 1]),'EdgeColor',hsv2rgb([0.3 1 1]),'LineWidth',1.5);
+bar(4+offset,dc.cane.mazesAll.wallTaps.mean,'FaceColor',hsv2rgb([0.3 0.2 1]),'EdgeColor',hsv2rgb([0.3 0.2 1]),'LineWidth',1.5);
+
+bar(5+offset,dc.belt.mazesAll.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+bar(6+offset,dc.cane.mazesAll.distance.mean,'FaceColor',hsv2rgb([0.6 0.2 1]),'EdgeColor',hsv2rgb([0.6 0.2 1]),'LineWidth',1.5);
+
+specsOverall = {'Duration Belt','Duration Belt','Collisions Belt','Taps Cane','Distance Belt','Distance Cane'};
+
+title('Overall Means','FontSize',titleFontSize)
+set(gca,'Xtick',1+offset:3*2+offset,'XTickLabel',specsOverall,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
+
 
 % clip the data
 % show min and max for taps and collisions, visualize that in a better way
