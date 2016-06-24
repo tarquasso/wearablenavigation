@@ -16,13 +16,13 @@ line([wd wd],[0 6.2],'LineWidth',4,'Color','black')
 if num == 0
     return;
 elseif num == 1
-    rectangle('Position',[-wd,3*h,bw,bh],'FaceColor','red');
+    rectangle('Position',[-wd,3*h,bw,bh],'FaceColor','g');
 elseif num == 2
-    rectangle('Position',[wd-bw,4*h,bw,bh],'FaceColor','red');
+    rectangle('Position',[wd-bw,4*h,bw,bh],'FaceColor','g');
 elseif num == 3
-    rectangle('Position',[wd-bw,2*h,bw,bh],'FaceColor','red');
+    rectangle('Position',[wd-bw,2*h,bw,bh],'FaceColor','g');
 elseif num == 4
-    rectangle('Position',[-wd,2*h,bw,bh],'FaceColor','red');
+    rectangle('Position',[-wd,2*h,bw,bh],'FaceColor','g');
 end
 
 
