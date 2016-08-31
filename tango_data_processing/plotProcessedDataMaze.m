@@ -1,5 +1,5 @@
 % FILL IN YOUR computer username here:
-editorNames = {'rkk', 'brandonaraki'};
+editorNames = {'rkk', 'brandonaraki_backup'};
 
 dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
     '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
