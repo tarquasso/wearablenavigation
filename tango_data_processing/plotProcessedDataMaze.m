@@ -24,7 +24,15 @@ filePath = strcat(dropboxPath,file);
 wallTapCol = 15;
 collisionCol = 18;
 
+xll = 0.6;
+xul = 2.4;
+
 f1 = figure();
+set(f1, 'Position', [30 60 1900 700])
+bigTitleFontSize = 24;
+titleFontSize = 18;
+legendFontSize = 20;
+xaxisFontSize = 16;
 
 for i=1:numTests
     test1 = tests{i}{1};
@@ -82,45 +90,55 @@ for i=1:numTests
         collisions = 0;
     end
     
-    subplot(4,2*numTests,[1 2 1+2*numTests 2+2*numTests]+2*(i-1));
+    % Plotting
+    
+    sp1 = subplot(3,3*numTests,[1 2 3 3*numTests+1 3*numTests+2 3*numTests+3]+3*(i-1));
     hold on
     plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','b');
     plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
-    legend('cane','belt','Location','southeast');
-    title(sprintf('User %02d Maze %d',userNum,mazeNum));
+    legend({'cane','belt'},'Location','southeast','FontSize',legendFontSize);
+    %title(sprintf('User %02d Maze %d',userNum,mazeNum),'FontSize',bigTitleFontSize);
+    title(sprintf('Maze %d',mazeNum),'FontSize',bigTitleFontSize);
     plot_maze(f1,mazeNum);
+    box off
+    set(gca,'visible','off')
     hold off
     
-    subplot(4,2*numTests,4*numTests+2*(i-1)+1)
+    sp2 = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
     hold on;
-    bar(1, distance1, 'facecolor', 'b');
-    bar(2, distance2, 'facecolor', 'r');
+    bar(1, distance1, 'facecolor', hsv2rgb([0 1 1.0]));
+    bar(2, distance2, 'facecolor', hsv2rgb([0 0.4 1]));
+    xlim(sp2,[xll xul])
     hold off;
-    ylabel('distance [m]');
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
+    ylabel('Distance [m]','FontSize',titleFontSize);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
 
-    subplot(4,2*numTests,4*numTests+2*(i-1)+2)
+    sp3 = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
     hold on;
-    bar(1, tt1, 'facecolor', 'b');
-    bar(2, tt2, 'facecolor', 'r');
+    bar(1, wallTaps, 'facecolor', hsv2rgb([0.3 1 1]));
+    bar(2, collisions, 'facecolor', hsv2rgb([0.3 0.2 1]));
+    xlim(sp3,[xll xul])
     hold off;
-    ylabel('time [s]')
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
+    ylabel('Wall Taps / Collisions','FontSize',titleFontSize);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
+    
+    sp4 = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
+    hold on;
+    bar(1, tt1, 'facecolor', hsv2rgb([0.6 1 1]));
+    bar(2, tt2, 'facecolor', hsv2rgb([0.6 0.2 1]));
+    xlim(sp4,[xll xul])
+    hold off;
+    ylabel('Duration [s]','FontSize',titleFontSize)
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
 
-    subplot(4,2*numTests,6*numTests+2*(i-1)+1)
-    hold on;
-    bar(1, ave1, 'facecolor', 'b');
-    bar(2, ave2, 'facecolor', 'r');
-    hold off;
-    ylabel('average velocity [m/s]')
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
+%     subplot(4,2*numTests,6*numTests+2*(i-1)+1)
+%     hold on;
+%     bar(1, ave1, 'facecolor', 'b');
+%     bar(2, ave2, 'facecolor', 'r');
+%     hold off;
+%     ylabel('average velocity [m/s]')
+%     set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
 
-    subplot(4,2*numTests,6*numTests+2*(i-1)+2)
-    hold on;
-    bar(1, wallTaps, 'facecolor', 'b');
-    bar(2, collisions, 'facecolor', 'r');
-    hold off;
-    ylabel('wall taps / collisions')
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'});
+
     
 end

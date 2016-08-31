@@ -1,4 +1,18 @@
-dropboxPath = '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/';
+% FILL IN YOUR computer username here:
+editorNames = {'rkk', 'brandonaraki'};
+
+dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
+    '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
+
+osUserName = char(java.lang.System.getProperty('user.name'));
+
+for k = 1:length(editorNames)
+    curName = editorNames{k};
+  if strcmp (osUserName,curName)
+      dropboxPath = dropboxPathOptions{k};
+  end
+end
+
 test1 = '029 user02 AC 11a belt bx1';
 path = strcat(dropboxPath,'processedData/',test1);
 load(path);
@@ -105,38 +119,82 @@ collisions3 = num(id3,collisionCol);
 collisions4 = num(id4,collisionCol);
 
 f1 = figure();
-hold on
-subplot(2,4,1);
-plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','b');
-plot_box(f1,maze1);
-title(sprintf('Box Trial %d',maze1));
-subplot(2,4,2);
-plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','b');
-plot_box(f1,maze2);
-title(sprintf('Box Trial %d',maze2));
-subplot(2,4,3);
-plot(x3(if3:il3)+x_shift3,y3(if3:il3)+y_shift3,'LineWidth',2.5,'Color','b');
-plot_box(f1,maze3);
-title(sprintf('Box Trial %d',maze3));
-subplot(2,4,4);
-plot(x4(if4:il4)+x_shift4,y4(if4:il4)+y_shift4,'LineWidth',2.5,'Color','b');
-plot_box(f1,maze4);
-title(sprintf('Box Trial %d',maze4));
+set(f1, 'Position', [30 60 1900 700])
+bigTitleFontSize = 24;
+titleFontSize = 18;
+legendFontSize = 20;
+xaxisFontSize = 16;
 
-subplot(2,4,5)
-bar([collisions1 distance1 tt1 ave1], 'facecolor', 'b');
-set(gca, 'XTick', 1, 'XTickLabel', {'collisions, distance, time, velocity'});
-subplot(2,4,6)
-bar([collisions2 distance2 tt2 ave2], 'facecolor', 'b');
-set(gca, 'XTick', 1, 'XTickLabel', {'collisions, distance, time, velocity'});
-subplot(2,4,7)
-bar([collisions3 distance3 tt3 ave3], 'facecolor', 'b');
-set(gca, 'XTick', 1, 'XTickLabel', {'collisions, distance, time, velocity'});
-subplot(2,4,8)
-bar([collisions4 distance4 tt4 ave4], 'facecolor', 'b');
-set(gca, 'XTick', 1, 'XTickLabel', {'collisions, distance, time, velocity'});
+hold on
+cols = 4;
+xll = 0.5;
+xul = 3.5;
+
+subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]);
+plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','r');
+plot_box(f1,maze1);
+title(sprintf('Box Trial %d',maze1),'FontSize',bigTitleFontSize);
+set(gca,'visible','off')
+
+subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+1);
+plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
+plot_box(f1,maze2);
+title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
+set(gca,'visible','off')
+
+subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+2);
+plot(x3(if3:il3)+x_shift3,y3(if3:il3)+y_shift3,'LineWidth',2.5,'Color','r');
+plot_box(f1,maze3);
+title(sprintf('Box Trial %d',maze3),'FontSize',bigTitleFontSize);
+set(gca,'visible','off')
+
+subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+3);
+plot(x4(if4:il4)+x_shift4,y4(if4:il4)+y_shift4,'LineWidth',2.5,'Color','r');
+plot_box(f1,maze4);
+title(sprintf('Box Trial %d',maze4),'FontSize',bigTitleFontSize);
+set(gca,'visible','off')
+
+
+sp1 = subplot(5,4,4*cols+1);
+bar(1,distance1, 'facecolor', 'r');
+hold on
+bar(2,collisions1, 'facecolor', 'g');
+bar(3,tt1, 'facecolor', 'b');
+set(sp1, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+xlim(sp1,[xll xul])
+hold off
+
+sp2 = subplot(5,4,4*cols+2);
+hold on
+
+bar(1,distance2, 'facecolor', 'r');
+bar(2,collisions2, 'facecolor', 'g');
+
+bar(3,tt2, 'facecolor', 'b');
+set(sp2, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+xlim(sp2,[xll xul])
+hold off
+
+sp3 = subplot(5,4,4*cols+3);
+bar(1,distance3, 'facecolor', 'r');
+hold on
+bar(2,collisions3, 'facecolor', 'g');
+bar(3,tt3, 'facecolor', 'b');
+set(sp3, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+xlim(sp3,[xll xul])
+hold off
+
+sp4 = subplot(5,4,4*cols+4);
+bar(1,distance4, 'facecolor', 'r');
+hold on
+bar(2,collisions4, 'facecolor', 'g');
+bar(3,tt4, 'facecolor', 'b');
+set(sp4, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+xlim(sp4,[xll xul])
+hold off
 
 annotation('textbox', [0 0.9 1 0.1], ...
     'String', 'User 02', ...
     'EdgeColor', 'none', ...
-    'HorizontalAlignment', 'center')
+    'HorizontalAlignment', 'center',...
+    'FontSize', 30)
