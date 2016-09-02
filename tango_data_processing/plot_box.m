@@ -13,6 +13,13 @@ hold on
 line([-wd -wd],[0 6.2],'LineWidth',4,'Color','black')
 line([wd wd],[0 6.2],'LineWidth',4,'Color','black')
 
+plot([-2.2 -1.2],[0.5,0.5],'k');
+plot([-2.2 -2.2],[0.45,0.55],'k');
+plot([-1.2 -1.2],[0.45,0.55],'k');
+text(-1.8,0.27,'1m');
+
+axis([-2.2 2.2 0 inf]);
+
 if num == 0
     return;
 elseif num == 1

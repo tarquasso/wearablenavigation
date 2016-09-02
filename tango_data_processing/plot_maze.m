@@ -61,7 +61,6 @@ elseif num == 4
     line([grid{1,6}(1) grid{6,6}(1)],[grid{1,6}(2) grid{6,6}(2)],'LineWidth',4,'Color','black')
 end
 
-
 hold off
 
 %     line([0.5 0.5],[0,2.5],'LineWidth',4,'Color','black')

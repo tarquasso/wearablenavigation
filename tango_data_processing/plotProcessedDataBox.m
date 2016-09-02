@@ -13,7 +13,22 @@ for k = 1:length(editorNames)
   end
 end
 
-test1 = '029 user02 AC 11a belt bx1';
+userNumber = 2;
+userNumToID = [1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 13];
+
+tests1 = { ...
+'010 user01 PP 07a belt bx1', ...
+'029 user02 AC 11a belt bx1', ...
+'044 user03 SG 12a belt bx1', ...
+'056 user04 SF 12a belt bx1', ...
+'081 user06 RC 12b belt bx1', ...
+'107 user08 HS 12b belt bx1', ...
+'186 user09 JK 12b belt bx1', ...
+'134 user10 KB 12a belt bx1', ...
+'146 user11 MK 12a belt bx1', ...
+'158 user12 BB 12a belt bx1', ...
+'170 user13 TL 12a belt bx1'};
+test1 = tests1{userNumber};
 path = strcat(dropboxPath,'processedData/',test1);
 load(path);
 
@@ -36,8 +51,19 @@ if tt1 < 0
     ave1 = distance1/tt1;
 end
 
-
-test2 = '027 user02 AC 09b belt bx2';
+tests2 = {...
+'027 user02 AC 09b belt bx2', ...
+'011 user01 PP 08a belt bx2', ...
+'042 user03 SG 10b belt bx2', ...
+'054 user04 SF 10a belt bx2', ...
+'078 user06 RC 10a belt bx2', ...
+'104 user08 HS 10a belt bx2', ...
+'119 user09 JK 10a belt bx2', ...
+'132 user10 KB 10a belt bx2', ...
+'144 user11 MK 10a belt bx2', ...
+'156 user12 BB 10a belt bx2', ...
+'168 user13 TL 10a belt bx2'};
+test2 = tests2{userNumber};
 path = strcat(dropboxPath,'processedData/',test2);
 load(path);
 
@@ -60,7 +86,19 @@ if tt2 < 0
     ave2 = distance2/tt2;
 end
 
-test3 = '028 user02 AC 10a belt bx3';
+tests3 = { ...
+'028 user02 AC 10a belt bx3', ...
+'012 user01 PP 09a belt bx3', ...
+'043 user03 SG 11a belt bx3', ...
+'055 user04 SF 11a belt bx3', ...
+'079 user06 RC 11a belt bx3', ...
+'105 user08 HS 11a belt bx3', ...
+'120 user09 JK 11a belt bx3', ...
+'133 user10 KB 11a belt bx3', ...
+'145 user11 MK 11a belt bx3', ...
+'157 user12 BB 11a belt bx3', ...
+'169 user13 TL 11a belt bx3'};
+test3 = tests3{userNumber};
 path = strcat(dropboxPath,'processedData/',test3);
 load(path);
 
@@ -83,7 +121,19 @@ if tt3 < 0
     ave3 = distance3/tt3;
 end
 
-test4 = '025 user02 AC 08b belt bx4';
+tests4 = { ... 
+'025 user02 AC 08b belt bx4', ...
+'012 user01 PP 09a belt bx3', ...
+'040 user03 SG 09b belt bx4', ...
+'053 user04 SF 09a belt bx4', ...
+'077 user06 RC 09a belt bx4', ...
+'103 user08 HS 09a belt bx4', ...
+'118 user09 JK 09b belt bx4', ...
+'131 user10 KB 09b belt bx4', ...
+'143 user11 MK 09a belt bx4', ...
+'155 user12 BB 09a belt bx4', ...
+'167 user13 TL 09a belt bx4'};
+test4 = tests4{userNumber};
 path = strcat(dropboxPath,'processedData/',test4);
 load(path);
 
@@ -119,11 +169,11 @@ collisions3 = num(id3,collisionCol);
 collisions4 = num(id4,collisionCol);
 
 f1 = figure();
-set(f1, 'Position', [30 60 1900 700])
-bigTitleFontSize = 24;
-titleFontSize = 18;
-legendFontSize = 20;
-xaxisFontSize = 16;
+set(f1, 'Position', [30 60 1200 400])
+bigTitleFontSize = 14;
+titleFontSize = 10;
+legendFontSize = 10;
+xaxisFontSize = 10;
 
 hold on
 cols = 4;
@@ -133,14 +183,17 @@ xul = 3.5;
 subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]);
 plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze1);
+text(-2.5,6,'B','FontSize',24);
 title(sprintf('Box Trial %d',maze1),'FontSize',bigTitleFontSize);
 set(gca,'visible','off')
 
-subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+1);
-plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
-plot_box(f1,maze2);
-title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
-set(gca,'visible','off')
+if userNumber ~= 11
+    subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+1);
+    plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
+    plot_box(f1,maze2);
+    title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
+    set(gca,'visible','off')
+end
 
 subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+2);
 plot(x3(if3:il3)+x_shift3,y3(if3:il3)+y_shift3,'LineWidth',2.5,'Color','r');
@@ -156,45 +209,45 @@ set(gca,'visible','off')
 
 
 sp1 = subplot(5,4,4*cols+1);
-bar(1,distance1, 'facecolor', 'r');
+bar(1,distance1, 'facecolor', 'm');
 hold on
 bar(2,collisions1, 'facecolor', 'g');
-bar(3,tt1, 'facecolor', 'b');
-set(sp1, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+bar(3,tt1, 'facecolor', 'c');
+set(sp1, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp1,[xll xul])
 hold off
 
 sp2 = subplot(5,4,4*cols+2);
 hold on
 
-bar(1,distance2, 'facecolor', 'r');
+bar(1,distance2, 'facecolor', 'm');
 bar(2,collisions2, 'facecolor', 'g');
 
-bar(3,tt2, 'facecolor', 'b');
-set(sp2, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+bar(3,tt2, 'facecolor', 'c');
+set(sp2, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp2,[xll xul])
 hold off
 
 sp3 = subplot(5,4,4*cols+3);
-bar(1,distance3, 'facecolor', 'r');
+bar(1,distance3, 'facecolor', 'm');
 hold on
 bar(2,collisions3, 'facecolor', 'g');
-bar(3,tt3, 'facecolor', 'b');
-set(sp3, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+bar(3,tt3, 'facecolor', 'c');
+set(sp3, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp3,[xll xul])
 hold off
 
 sp4 = subplot(5,4,4*cols+4);
-bar(1,distance4, 'facecolor', 'r');
+bar(1,distance4, 'facecolor', 'm');
 hold on
 bar(2,collisions4, 'facecolor', 'g');
-bar(3,tt4, 'facecolor', 'b');
-set(sp4, 'XTick', 1:3, 'XTickLabel', {'Distance','Collisions', 'Duration'},'FontSize',xaxisFontSize);
+bar(3,tt4, 'facecolor', 'c');
+set(sp4, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp4,[xll xul])
 hold off
 
-annotation('textbox', [0 0.9 1 0.1], ...
-    'String', 'User 02', ...
-    'EdgeColor', 'none', ...
-    'HorizontalAlignment', 'center',...
-    'FontSize', 30)
+% annotation('textbox', [0 0.9 1 0.1], ...
+%     'String', 'User 13', ...
+%     'EdgeColor', 'none', ...
+%     'HorizontalAlignment', 'center',...
+%     'FontSize', 30)
