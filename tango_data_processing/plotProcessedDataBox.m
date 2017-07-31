@@ -1,5 +1,5 @@
 % FILL IN YOUR computer username here:
-editorNames = {'rkk', 'brandonaraki'};
+editorNames = {'rkk', 'brandonaraki_backup'};
 
 dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
     '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
@@ -13,7 +13,7 @@ for k = 1:length(editorNames)
   end
 end
 
-userNumber = 2;
+userNumber = 11;
 userNumToID = [1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 13];
 
 tests1 = { ...
@@ -209,10 +209,10 @@ set(gca,'visible','off')
 
 
 sp1 = subplot(5,4,4*cols+1);
-bar(1,distance1, 'facecolor', 'm');
+bar(1,distance1, 'facecolor', [0.4 0.4 1]);
 hold on
-bar(2,collisions1, 'facecolor', 'g');
-bar(3,tt1, 'facecolor', 'c');
+bar(2,collisions1, 'facecolor', [0.4 1 0.4]);
+bar(3,tt1, 'facecolor', [1 0.4 0.4]);
 set(sp1, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp1,[xll xul])
 hold off
@@ -220,28 +220,28 @@ hold off
 sp2 = subplot(5,4,4*cols+2);
 hold on
 
-bar(1,distance2, 'facecolor', 'm');
-bar(2,collisions2, 'facecolor', 'g');
+bar(1,distance2, 'facecolor', [0.4 0.4 1]);
+bar(2,collisions2, 'facecolor', [0.4 1 0.4]);
 
-bar(3,tt2, 'facecolor', 'c');
+bar(3,tt2, 'facecolor', [1 0.4 0.4]);
 set(sp2, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp2,[xll xul])
 hold off
 
 sp3 = subplot(5,4,4*cols+3);
-bar(1,distance3, 'facecolor', 'm');
+bar(1,distance3, 'facecolor', [0.4 0.4 1]);
 hold on
-bar(2,collisions3, 'facecolor', 'g');
-bar(3,tt3, 'facecolor', 'c');
+bar(2,collisions3, 'facecolor', [0.4 1 0.4]);
+bar(3,tt3, 'facecolor', [1 0.4 0.4]);
 set(sp3, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp3,[xll xul])
 hold off
 
 sp4 = subplot(5,4,4*cols+4);
-bar(1,distance4, 'facecolor', 'm');
+bar(1,distance4, 'facecolor', [0.4 0.4 1]);
 hold on
-bar(2,collisions4, 'facecolor', 'g');
-bar(3,tt4, 'facecolor', 'c');
+bar(2,collisions4, 'facecolor', [0.4 1 0.4]);
+bar(3,tt4, 'facecolor', [1 0.4 0.4]);
 set(sp4, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
 xlim(sp4,[xll xul])
 hold off

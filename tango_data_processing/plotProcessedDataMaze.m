@@ -13,7 +13,7 @@ for k = 1:length(editorNames)
   end
 end
 
-userNumber = 2;
+userNumber = 11;
 
 users = { ...
 {{'005 user01 PP 01c cane mz1','009 user01 PP 06b belt mz1'},{'002 user01 PP 02a cane mz2','006 user01 PP 04a belt mz2'},{'003 user01 PP 03a cane mz3','007 user01 PP 05a belt mz3'}}, ...
@@ -158,8 +158,8 @@ for i=1:numTests
     
     sp2 = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
     hold on;
-    bar(1, distance1, 'facecolor', [0 0.2 1]);
-    bar(2, distance2, 'facecolor', [1 0.2 0]);
+    bar(1, distance1, 'facecolor', [0.1 0.1 1]);
+    bar(2, distance2, 'facecolor', [1 0.1 0.1]);
     xlim(sp2,[xll xul])
     hold off;
     ylabel('Distance [m]','FontSize',titleFontSize);
@@ -167,8 +167,8 @@ for i=1:numTests
 
     sp3 = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
     hold on;
-    bar(1, wallTaps, 'facecolor', [0.3 0.6 1]);
-    bar(2, collisions, 'facecolor', [1 0.6 0.3]);
+    bar(1, wallTaps, 'facecolor', [0.4 0.4 1]);
+    bar(2, collisions, 'facecolor', [1 0.4 0.4]);
     xlim(sp3,[xll xul])
     hold off;
     ylabel('Wall Taps / Collisions','FontSize',titleFontSize);
@@ -176,8 +176,8 @@ for i=1:numTests
     
     sp4 = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
     hold on;
-    bar(1, tt1, 'facecolor', 'c');
-    bar(2, tt2, 'facecolor', 'm');
+    bar(1, tt1, 'facecolor', [0.77 0.77 1]);
+    bar(2, tt2, 'facecolor', [1 0.77 0.77]);
     xlim(sp4,[xll xul])
     hold off;
     ylabel('Duration [s]','FontSize',titleFontSize)
