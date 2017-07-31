@@ -17,7 +17,7 @@ for k = 1:length(editorNames)
   end
 end
 
-filename = 'data-analysis-blind-users-20160524_with_tango.mat';
+filename = 'data-analysis-blind-users-20160524rev1_with_tango.mat';
 
 matFileToOpen = strcat(dropboxPath,filename);
 load(matFileToOpen);
@@ -31,9 +31,12 @@ containsUsefulData = cell2mat(data(:,usefulCol));
 [~,tangoOkCol,~] = find(strcmp(dataheader,'tangoOk'));
 containsTangoOkData = cell2mat(data(:,tangoOkCol));
 
-containsUsefulData = containsUsefulData & containsTangoOkData;
+% comment out if only working tango to be used
+%containsUsefulData = containsUsefulData & containsTangoOkData;
 
 [~,idCol,~] = find(strcmp(dataheader,'id'));
+
+[~,userCol,~] = find(strcmp(dataheader,'user_'));
 
 [~,deviceCol,~] = find(strcmp(dataheader,'device'));
 
@@ -46,11 +49,14 @@ containsBelt = strcmp(data(:,deviceCol),'belt') & containsUsefulData;
 [~,totTimCol,~] = find(strcmp(dataheader,'total_time'));
 [~,aveVelCol,~] = find(strcmp(dataheader,'ave_velocity'));
 
-%[~,wallTapsCol,~] = find(strcmp(dataheader,'WallTaps'));
-[~,wallTapsCol,~] = find(strcmp(dataheader,'wallTapsAct'));
+[~,wallTapsCol,~] = find(strcmp(dataheader,'WallTaps'));
+%dont take wallTapsAct, error in "process_tango_data_excel" script
+%[~,wallTapsCol1,~] = find(strcmp(dataheader,'wallTapsAct'));
 
-%[~,majCollCol,~] = find(strcmp(dataheader,'x_MajorCollision_boxOrIntoWall_'));
-[~,majCollCol,~] = find(strcmp(dataheader,'majCollAct'));
+[~,majCollCol,~] = find(strcmp(dataheader,'x_MajorCollision_boxOrIntoWall_'));
+%dont take majCollAct, error in process_tango_data_excel
+
+%[~,majCollCol1,~] = find(strcmp(dataheader,'majCollAct'));
 [~,distCol,~] = find(strcmp(dataheader,'distance'));
 
 % set up the compiled data
@@ -66,9 +72,22 @@ mazeName = ['mz' num2str(ii)];
 
 containsThisMaze = strcmp(data(:,taskCol),mazeName);
 [mzCaneRows,~,~] = find( containsCane & containsThisMaze);
+dc.cane.maze{ii}.user = cell2mat(data(mzCaneRows,userCol));
+%Replicate the cane data of user 2 from the first day and append
+mzCaneRows = cat(1,mzCaneRows, mzCaneRows( dc.cane.maze{ii}.user == 2));
+%redo the user extraction
+dc.cane.maze{ii}.user = cell2mat(data(mzCaneRows,userCol));
+% continue as usual
 dc.cane.maze{ii}.id = cell2mat(data(mzCaneRows,idCol));
 dc.cane.maze{ii}.durationVideo.raw = cell2mat(data(mzCaneRows,vidDurCol));
 dc.cane.maze{ii}.durationTango.raw = cell2mat(data(mzCaneRows,totTimCol));
+
+%find elements that dont have tango data
+noTango = isnan(dc.cane.maze{ii}.durationTango.raw);
+%replace this NaN value with video duration
+dc.cane.maze{ii}.durationTango.raw(noTango) = dc.cane.maze{ii}.durationVideo.raw(noTango);
+
+%Calculate Average Velocity, Wall taps and Distance
 dc.cane.maze{ii}.averageVelocity.raw = cell2mat(data(mzCaneRows,aveVelCol));
 dc.cane.maze{ii}.wallTaps.raw = cell2mat(data(mzCaneRows,wallTapsCol));
 dc.cane.maze{ii}.distance.raw = cell2mat(data(mzCaneRows,distCol));
@@ -97,19 +116,26 @@ dc.cane.maze{ii}.wallTaps.min = min(dc.cane.maze{ii}.wallTaps.raw);
 dc.cane.maze{ii}.wallTaps.deltaLow = dc.cane.maze{ii}.wallTaps.mean - dc.cane.maze{ii}.wallTaps.min;
 dc.cane.maze{ii}.wallTaps.max = max(dc.cane.maze{ii}.wallTaps.raw);
 dc.cane.maze{ii}.wallTaps.deltaHigh = dc.cane.maze{ii}.wallTaps.max - dc.cane.maze{ii}.wallTaps.mean;
-dc.cane.maze{ii}.distance.mean = mean(dc.cane.maze{ii}.distance.raw);
-dc.cane.maze{ii}.distance.std = std(dc.cane.maze{ii}.distance.raw);
+withTango = ~(dc.cane.maze{ii}.user == 7);
+dc.cane.maze{ii}.distance.mean = mean(dc.cane.maze{ii}.distance.raw(withTango));
+dc.cane.maze{ii}.distance.std = std(dc.cane.maze{ii}.distance.raw(withTango));
 
 %BELT MAZE
 
 [mzBeltRows,~,~] = find( containsBelt & containsThisMaze);
 dc.belt.maze{ii}.id = cell2mat(data(mzBeltRows,idCol));
+dc.belt.maze{ii}.user = cell2mat(data(mzBeltRows,userCol));
 
 dc.belt.maze{ii}.durationVideo.raw = cell2mat(data(mzBeltRows,vidDurCol));
 dc.belt.maze{ii}.durationTango.raw = cell2mat(data(mzBeltRows,totTimCol));
 dc.belt.maze{ii}.averageVelocity.raw = cell2mat(data(mzBeltRows,aveVelCol));
 dc.belt.maze{ii}.majorColl.raw = cell2mat(data(mzBeltRows,majCollCol));
 dc.belt.maze{ii}.distance.raw = cell2mat(data(mzBeltRows,distCol));
+
+%find elements that dont have tango data
+noTango = isnan(dc.belt.maze{ii}.durationTango.raw);
+%replace this NaN value with video duration
+dc.belt.maze{ii}.durationTango.raw(noTango) = dc.belt.maze{ii}.durationVideo.raw(noTango);
 
 %{
 hfig{4+ii}= figure(4+ii);
@@ -128,6 +154,7 @@ dc.belt.maze{ii}.durationVideo.mean = mean(dc.belt.maze{ii}.durationVideo.raw);
 dc.belt.maze{ii}.durationVideo.std = std(dc.belt.maze{ii}.durationVideo.raw);
 dc.belt.maze{ii}.durationTango.mean = mean(dc.belt.maze{ii}.durationTango.raw);
 dc.belt.maze{ii}.durationTango.std = std(dc.belt.maze{ii}.durationTango.raw);
+
 dc.belt.maze{ii}.majorColl.mean = mean(dc.belt.maze{ii}.majorColl.raw);
 dc.belt.maze{ii}.majorColl.std = std(dc.belt.maze{ii}.majorColl.raw);
 dc.belt.maze{ii}.majorColl.min = min(dc.belt.maze{ii}.majorColl.raw);
@@ -135,20 +162,45 @@ dc.belt.maze{ii}.majorColl.deltaLow = dc.belt.maze{ii}.majorColl.mean - dc.belt.
 dc.belt.maze{ii}.majorColl.max = max(dc.belt.maze{ii}.majorColl.raw);
 dc.belt.maze{ii}.majorColl.deltaHigh = dc.belt.maze{ii}.majorColl.max - dc.belt.maze{ii}.majorColl.mean;
 
-dc.belt.maze{ii}.distance.mean = mean(dc.belt.maze{ii}.distance.raw);
-dc.belt.maze{ii}.distance.std = std(dc.belt.maze{ii}.distance.raw);
+withTango = ~(dc.cane.maze{ii}.user == 7);
+dc.belt.maze{ii}.distance.mean = mean(dc.belt.maze{ii}.distance.raw(withTango));
+dc.belt.maze{ii}.distance.std = std(dc.belt.maze{ii}.distance.raw(withTango));
 
-%BELT BOX
+
+% t-test between cane and belt
+range = 1:length(dc.belt.maze{ii}.durationTango.raw);
+[h,p,ci,stats] = ttest(dc.belt.maze{ii}.durationTango.raw(range),dc.cane.maze{ii}.durationTango.raw(range), 'Alpha',0.05/4);
+
+dc.belt.maze{ii}.durationTango.tTest = h;
+dc.belt.maze{ii}.durationTango.pValue = p;
+dc.cane.maze{ii}.durationTango.pValue = h;
+dc.cane.maze{ii}.durationTango.pValue = p;
+
+
+[h,p,ci,stats] = ttest(dc.belt.maze{ii}.majorColl.raw,dc.cane.maze{ii}.wallTaps.raw, 'Alpha',0.05/4)
+dc.belt.maze{ii}.majorColl.pValue = p;
+dc.cane.maze{ii}.majorColl.pValue = p;
+
+[h,p,ci,stats] = ttest(dc.belt.maze{ii}.distance.raw,dc.cane.maze{ii}.distance.raw, 'Alpha',0.05/4);
+dc.belt.maze{ii}.distance.pValue = p;
+dc.cane.maze{ii}.distance.pValue = p;
+
+%% BELT BOX
 
 boxName = ['bx' num2str(ii)];
 containsThisBox = strcmp(data(:,taskCol),boxName);
 
 [bxBeltRows,~,~] = find( containsBelt & containsThisBox);
-dc.belt.box{ii}.durationVideo.raw = data(bxBeltRows,vidDurCol);
-dc.belt.box{ii}.durationTango.raw = data(bxBeltRows,totTimCol);
-dc.belt.box{ii}.averageVelocity.raw = data(bxBeltRows,aveVelCol);
+dc.belt.box{ii}.durationVideo.raw = cell2mat(data(bxBeltRows,vidDurCol));
+dc.belt.box{ii}.durationTango.raw = cell2mat(data(bxBeltRows,totTimCol));
 
-dc.belt.box{ii}.majorColl.raw = data(mzCaneRows,majCollCol);
+%find elements that dont have tango data
+noTango = isnan(dc.belt.box{ii}.durationTango.raw);
+%replace this NaN value with video duration
+dc.belt.box{ii}.durationTango.raw(noTango) = dc.belt.box{ii}.durationVideo.raw(noTango);
+
+dc.belt.box{ii}.averageVelocity.raw = cell2mat(data(bxBeltRows,aveVelCol));
+dc.belt.box{ii}.majorColl.raw = cell2mat(data(mzCaneRows,majCollCol));
 
 end
 
@@ -227,15 +279,33 @@ offset = 33;
 
 for ii = numOfMazes:-1:1
 
+%% DURATION
 sp1 = subplot(1,3,1);
 xlim(sp1,[offset 3*numOfMazes+offset])
 
-bar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0 0.7 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
 hold on;
 errorbar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,dc.belt.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0.6 0.7 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
 errorbar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,dc.cane.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
+
+xOffset = -0.3;
+xt = (ii-1)*3+offset+1+ xOffset;
+maxBarValueBelt = dc.belt.maze{ii}.durationTango.mean+dc.belt.maze{ii}.durationTango.std;
+maxBarValueCane = dc.cane.maze{ii}.durationTango.mean+dc.cane.maze{ii}.durationTango.std;
+yMaxPerPair = max(maxBarValueBelt,maxBarValueCane);
+
+yOffset = 8;
+%yt=yMaxPerPair+yOffset;
+yt=yOffset;
+
+ytxt=[num2str((dc.belt.maze{ii}.durationTango.pValue*100),'p = %.2f'),char(37)];
+if(dc.belt.maze{ii}.durationTango.pValue*100 <= 5/4)
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25,'fontweight','bold')
+else
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25)
+end
 
 specs1 = horzcat(['HW ' num2str(ii) ' Belt Duration'],['HW ' num2str(ii) ' Cane Duration'],' ',specs1);
 title('Test Duration - Belt vs. Cane','FontSize',titleFontSize)
@@ -243,12 +313,15 @@ title('Test Duration - Belt vs. Cane','FontSize',titleFontSize)
 ylabel('Duration [s]','FontSize',titleFontSize)
 set(gca,'Xtick',offset+1:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs1,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
+set(sp1(1),'YTick',0:10:120)
+
 dc.belt.mazesAll.durationTango.raw(ii) = dc.belt.maze{ii}.durationTango.mean;
 dc.cane.mazesAll.durationTango.raw(ii) = dc.cane.maze{ii}.durationTango.mean;
 
 
-%ylim([-3 inf]) % or your lower limit.
+%ylim([0 135]) % or your lower limit.
 
+%% COLLISIONS/TAPS
 sp2 = subplot(1,3,2);
 xlim(sp2,[offset 3*numOfMazes+offset])
 
@@ -269,12 +342,25 @@ xlim(sp2,[offset 3*numOfMazes+offset])
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.3 0.4 0.8]),'EdgeColor',hsv2rgb([0.3 1 1]),'LineWidth',1.5);
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.min,'FaceColor',hsv2rgb([0.3 1 1]),'EdgeColor',hsv2rgb([0.3 0.4 1]),'LineWidth',1.5);
 
-bar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,'FaceColor',hsv2rgb([0 0.7 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
 hold on;
 errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,min(dc.belt.maze{ii}.majorColl.std,dc.belt.maze{ii}.majorColl.deltaLow),dc.belt.maze{ii}.majorColl.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.6 0.7 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
 errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,min(dc.cane.maze{ii}.wallTaps.std,dc.cane.maze{ii}.wallTaps.deltaLow),dc.cane.maze{ii}.wallTaps.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
+
+%add p-value
+xOffset = -0.3;
+xt = (ii-1)*3+offset+1+ xOffset;
+yOffset = 2;
+%yt=yMaxPerPair+yOffset;
+yt=yOffset;
+ytxt=[num2str((dc.belt.maze{ii}.majorColl.pValue*100),'p = %.3f'),char(37)];
+if(dc.belt.maze{ii}.majorColl.pValue*100 <= 5/4)
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25,'fontweight','bold')
+else
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25)
+end
 
 specs2 = horzcat(['HW ' num2str(ii) ' Belt Collisions'],['HW ' num2str(ii) ' Cane Wall Taps'],' ',specs2);
 
@@ -287,7 +373,11 @@ set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,'XTi
 dc.belt.mazesAll.majorColl.raw(ii) = dc.belt.maze{ii}.majorColl.mean;
 dc.cane.mazesAll.wallTaps.raw(ii) = dc.cane.maze{ii}.wallTaps.mean;
 
+set(sp2(1),'YTick',0:1:22)
+ylim([0 22.5]) % or your lower limit.
 
+
+%% DISTANCE
 sp3 = subplot(1,3,3);
 xlim(sp3,[offset 3*numOfMazes+offset])
 bar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
@@ -297,6 +387,20 @@ errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,dc.belt.maze{ii}.dista
 bar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
 errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,dc.cane.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6])); 
 
+%add p-value
+xOffset = -0.3;
+xt = (ii-1)*3+offset+1+ xOffset;
+yOffset = 2;
+%yt=yMaxPerPair+yOffset;
+yt=yOffset;
+ytxt=[num2str((dc.belt.maze{ii}.distance.pValue*100),'p = %.2f'),char(37)];
+
+if(dc.belt.maze{ii}.distance.pValue*100 <= 5/4)
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25,'fontweight','bold')
+else
+    text(xt,yt,ytxt,'rotation',60,'fontsize',25)
+end
+
 specs3 = horzcat(['HW ' num2str(ii) ' Belt Avg Distance' ],['HW ' num2str(ii) ' Cane Avg Distance'],' ',specs3);
 
 title('Distance Traveled - Belt vs. Cane','FontSize',titleFontSize)
@@ -304,6 +408,8 @@ title('Distance Traveled - Belt vs. Cane','FontSize',titleFontSize)
 ylabel('Distance [m]','FontSize',titleFontSize)
 
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
+
+set(sp3(1),'YTick',0:2:30)
 
 dc.belt.mazesAll.distance.raw(ii) = dc.belt.maze{ii}.distance.mean;
 dc.cane.mazesAll.distance.raw(ii) = dc.cane.maze{ii}.distance.mean;
@@ -357,9 +463,8 @@ set(gca,'Xtick',1+offset:3*2+offset,'XTickLabel',specsOverall,'XTickLabelRotatio
 
 % clip the data
 % show min and max for taps and collisions, visualize that in a better way
+%}
 
-fileOutCompiledData = 'data-analysis-blind-users-20160524_with_tango_compiled_170730.mat';
+fileOutCompiledData = 'data-analysis-blind-users-20160524_with_tango_compiled_170731.mat';
 filePathOutCompiledData = strcat(dropboxPath,fileOutCompiledData);
 save(filePathOutCompiledData,'dc');
-
-%}
