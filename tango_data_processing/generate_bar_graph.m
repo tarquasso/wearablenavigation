@@ -73,6 +73,7 @@ dc.cane.maze{ii}.averageVelocity.raw = cell2mat(data(mzCaneRows,aveVelCol));
 dc.cane.maze{ii}.wallTaps.raw = cell2mat(data(mzCaneRows,wallTapsCol));
 dc.cane.maze{ii}.distance.raw = cell2mat(data(mzCaneRows,distCol));
 
+%{
 hfig{ii} = figure(ii);
 set(hfig{ii}, 'Position', [((ii-1)*screensize(3)/numOfMazes) 0 screensize(3)/numOfMazes screensize(4)/2])
 
@@ -82,7 +83,7 @@ plot(dc.cane.maze{ii}.id,dc.cane.maze{ii}.durationTango.raw,'o')
 legend('duration video','duration tango');
 
 title(['cane ' ,mazeName])
-
+%}
 
 % Calculate averages and stds
 dc.cane.maze{ii}.durationVideo.mean = mean(dc.cane.maze{ii}.durationVideo.raw);
@@ -110,7 +111,7 @@ dc.belt.maze{ii}.averageVelocity.raw = cell2mat(data(mzBeltRows,aveVelCol));
 dc.belt.maze{ii}.majorColl.raw = cell2mat(data(mzBeltRows,majCollCol));
 dc.belt.maze{ii}.distance.raw = cell2mat(data(mzBeltRows,distCol));
 
-
+%{
 hfig{4+ii}= figure(4+ii);
 set(hfig{4+ii}, 'Position', [((ii-1)*screensize(3)/numOfMazes) screensize(4)/2 screensize(3)/numOfMazes screensize(4)/2])
 
@@ -119,6 +120,8 @@ hold on
 plot(dc.belt.maze{ii}.id,dc.belt.maze{ii}.durationTango.raw,'o')
 legend('duration video','duration tango');
 title(['belt ' ,mazeName])
+
+%}
 
 % Calculate averages and stds and mins and max
 dc.belt.maze{ii}.durationVideo.mean = mean(dc.belt.maze{ii}.durationVideo.raw);
@@ -149,6 +152,7 @@ dc.belt.box{ii}.majorColl.raw = data(mzCaneRows,majCollCol);
 
 end
 
+%{
 %% First Bar Graph
 figure(10)
 specs = {};
@@ -194,6 +198,7 @@ end
 
 set(gca,'Xtick',1:numOfMazes*5+numOfMazes,'XTickLabel',specs,'XTickLabelRotation',60)
 
+%}
 
 %% Third Bar Graph With Subplots
 hFig = figure(12);
@@ -214,8 +219,8 @@ dc.belt.mazesAll.distance.raw = zeros(numOfMazes,1);
 dc.cane.mazesAll.distance.raw = zeros(numOfMazes,1);
 
 
-titleFontSize = 20;
-xaxisFontSize = 15;
+titleFontSize = 155;
+xaxisFontSize = 20;
 axisRotation = 45;
 offset = 33;
 
@@ -229,12 +234,13 @@ bar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0
 hold on;
 errorbar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,dc.belt.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0 0.4 1]),'EdgeColor',hsv2rgb([0 0.4 1]),'LineWidth',1.5);
-errorbar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,dc.cane.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
+bar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+errorbar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,dc.cane.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
 
 specs1 = horzcat(['HW ' num2str(ii) ' Belt Duration'],['HW ' num2str(ii) ' Cane Duration'],' ',specs1);
-title('Durations','FontSize',titleFontSize)
+title('Test Duration - Belt vs. Cane','FontSize',titleFontSize)
 
+ylabel('Duration [s]','FontSize',titleFontSize)
 set(gca,'Xtick',offset+1:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs1,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 dc.belt.mazesAll.durationTango.raw(ii) = dc.belt.maze{ii}.durationTango.mean;
@@ -263,16 +269,19 @@ xlim(sp2,[offset 3*numOfMazes+offset])
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.3 0.4 0.8]),'EdgeColor',hsv2rgb([0.3 1 1]),'LineWidth',1.5);
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.min,'FaceColor',hsv2rgb([0.3 1 1]),'EdgeColor',hsv2rgb([0.3 0.4 1]),'LineWidth',1.5);
 
-bar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,'FaceColor',hsv2rgb([0.3 1 1]),'EdgeColor',hsv2rgb([0.3 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
 hold on;
-errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,min(dc.belt.maze{ii}.majorColl.std,dc.belt.maze{ii}.majorColl.deltaLow),dc.belt.maze{ii}.majorColl.std,'LineWidth',1.5,'Color',hsv2rgb([0.3 1 0.6]),'linestyle','none'); 
+errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,min(dc.belt.maze{ii}.majorColl.std,dc.belt.maze{ii}.majorColl.deltaLow),dc.belt.maze{ii}.majorColl.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.3 0.2 1]),'EdgeColor',hsv2rgb([0.3 0.2 1]),'LineWidth',1.5);
-errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,min(dc.cane.maze{ii}.wallTaps.std,dc.cane.maze{ii}.wallTaps.deltaLow),dc.cane.maze{ii}.wallTaps.std,'LineWidth',1.5,'Color',hsv2rgb([0.3 1 0.6]),'linestyle','none'); 
+bar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,min(dc.cane.maze{ii}.wallTaps.std,dc.cane.maze{ii}.wallTaps.deltaLow),dc.cane.maze{ii}.wallTaps.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
 
-specs2 = horzcat(['HW ' num2str(ii) ' Belt Major Collisions'],['HW ' num2str(ii) ' Cane Wall Taps'],' ',specs2);
+specs2 = horzcat(['HW ' num2str(ii) ' Belt Collisions'],['HW ' num2str(ii) ' Cane Wall Taps'],' ',specs2);
 
-title('Collisions and Taps','FontSize',titleFontSize)
+title('Wall Contacts - Belt vs. Cane','FontSize',titleFontSize)
+
+ylabel('Collisions / Taps','FontSize',titleFontSize)
+
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 dc.belt.mazesAll.majorColl.raw(ii) = dc.belt.maze{ii}.majorColl.mean;
@@ -281,17 +290,19 @@ dc.cane.mazesAll.wallTaps.raw(ii) = dc.cane.maze{ii}.wallTaps.mean;
 
 sp3 = subplot(1,3,3);
 xlim(sp3,[offset 3*numOfMazes+offset])
-bar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
-
+bar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
 hold on;
-errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,dc.belt.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6])); 
+errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,dc.belt.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6])); 
 
-bar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 0.2 1]),'EdgeColor',hsv2rgb([0.6 0.2 1]),'LineWidth',1.5);
+bar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
 errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,dc.cane.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6])); 
 
 specs3 = horzcat(['HW ' num2str(ii) ' Belt Avg Distance' ],['HW ' num2str(ii) ' Cane Avg Distance'],' ',specs3);
 
-title('Distances','FontSize',titleFontSize)
+title('Distance Traveled - Belt vs. Cane','FontSize',titleFontSize)
+
+ylabel('Distance [m]','FontSize',titleFontSize)
+
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 dc.belt.mazesAll.distance.raw(ii) = dc.belt.maze{ii}.distance.mean;
@@ -300,6 +311,7 @@ dc.cane.mazesAll.distance.raw(ii) = dc.cane.maze{ii}.distance.mean;
 
 end
 
+%{
 hFig = figure(13);
 set(hFig, 'Position', [30 60 1800 1024])
 
@@ -342,9 +354,12 @@ title('Overall Means','FontSize',titleFontSize)
 set(gca,'Xtick',1+offset:3*2+offset,'XTickLabel',specsOverall,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 
+
 % clip the data
 % show min and max for taps and collisions, visualize that in a better way
 
-fileOutCompiledData = 'data-analysis-blind-users-20160524_with_tango_compiled.mat';
+fileOutCompiledData = 'data-analysis-blind-users-20160524_with_tango_compiled_170730.mat';
 filePathOutCompiledData = strcat(dropboxPath,fileOutCompiledData);
 save(filePathOutCompiledData,'dc');
+
+%}
