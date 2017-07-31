@@ -200,7 +200,7 @@ noTango = isnan(dc.belt.box{ii}.durationTango.raw);
 dc.belt.box{ii}.durationTango.raw(noTango) = dc.belt.box{ii}.durationVideo.raw(noTango);
 
 dc.belt.box{ii}.averageVelocity.raw = cell2mat(data(bxBeltRows,aveVelCol));
-dc.belt.box{ii}.majorColl.raw = cell2mat(data(mzCaneRows,majCollCol));
+dc.belt.box{ii}.majorColl.raw = cell2mat(data(bxBeltRows,majCollCol));
 
 end
 
