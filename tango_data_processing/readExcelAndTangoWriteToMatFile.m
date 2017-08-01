@@ -21,13 +21,13 @@ for k = 1:length(editorNames)
   end
 end
 
-fileIn = 'data-analysis-blind-users-20160524.xlsx';
+fileIn = 'data-analysis-blind-users-20160524rev1.xlsx';
 
 processedDataFolderName = 'processedData/';
 processedDataFilesPath = [dropboxPath,processedDataFolderName];
 processedDataFileName = '*.mat';
 
-fileOutTango = 'data-analysis-blind-users-20160524_with_tango.mat';
+fileOutTango = 'data-analysis-blind-users-20160524rev1_with_tango1.mat';
 filePathOutTango = strcat(dropboxPath,fileOutTango);
 % writing to csv not fully functional yet...
 %fileOutTangoCSV = 'data-analysis-blind-users-20160524_with_tango.csv';
