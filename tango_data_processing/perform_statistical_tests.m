@@ -3,10 +3,11 @@ close all
 
 % dropbox folder location
 % FILL IN YOUR computer username here:
-editorNames = {'rkk', 'brandonaraki'};
+editorNames = {'rkk', 'brandonaraki', 'santaniteng'};
 
 dropboxPathOptions = {'~/Dropbox (MIT)/Robotics Research/haptic devices/Experiments/study may 2016/',...
-    '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/'};
+    '/Users/brandonaraki_backup/Dropbox (MIT)/haptic devices/Experiments/study may 2016/',...
+    '/Users/santaniteng/Downloads/'};
 
 osUserName = char(java.lang.System.getProperty('user.name'));
 
@@ -177,7 +178,6 @@ dc.belt.maze{ii}.durationTango.pValue = p;
 dc.cane.maze{ii}.durationTango.pValue = h;
 dc.cane.maze{ii}.durationTango.pValue = p;
 
-
 [h,p,ci,stats] = ttest(dc.belt.maze{ii}.majorColl.raw,...
     dc.cane.maze{ii}.wallTaps.raw, 'Alpha',0.05/4)
 dc.belt.maze{ii}.majorColl.pValue = p;
@@ -274,8 +274,8 @@ dc.belt.mazesAll.distance.raw = zeros(numOfMazes,1);
 dc.cane.mazesAll.distance.raw = zeros(numOfMazes,1);
 
 
-titleFontSize = 155;
-xaxisFontSize = 20;
+titleFontSize = 19;
+xaxisFontSize = 19;
 axisRotation = 45;
 offset = 33;
 pValFontSize = 16;
@@ -307,11 +307,13 @@ yOffset = 5;
 yt=yMaxPerPair+yOffset;
 
 ytxt=num2str((dc.belt.maze{ii}.durationTango.pValue),'p=%.3f');
-if(dc.belt.maze{ii}.durationTango.pValue*100 <= 5/4)
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize,'fontweight','bold')
-else
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
+
+for jj = 1:3
+if(dc.belt.maze{ii}.durationTango.pValue*10 *10^jj <= 5/4)
+ytxt = ['*',ytxt];
 end
+end
+text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
 
 %plot p value overarching bar
 xLine = xFirstBar;
@@ -320,8 +322,8 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
     'Color','black','LineStyle','-','LineWidth',pbarwidth)
 
 
-specs1 = horzcat(['HW ' num2str(ii) ' Belt Duration'],['HW ' num2str(ii) ' Cane Duration'],' ',specs1);
-title('Test Duration - Belt vs. Cane','FontSize',titleFontSize)
+specs1 = horzcat(['HW ' num2str(ii) ' System'],['HW ' num2str(ii) ' White Cane'],' ',specs1);
+title('Trial Duration - System vs. White Cane','FontSize',titleFontSize)
 
 ylabel('Duration [s]','FontSize',titleFontSize)
 set(gca,'Xtick',offset+1:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs1,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
@@ -370,18 +372,21 @@ errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,...
 
 %add p-value
 xFirstBar = (ii-1)*3+offset+1;
-xOffsetSpecial = -0.6;
+xOffsetSpecial = -0.8;
 xt = xFirstBar+ xOffsetSpecial;
 yOffset = 1;
 yMaxPerPair = max(dc.cane.maze{ii}.wallTaps.mean+dc.cane.maze{ii}.wallTaps.std,...
     dc.belt.maze{ii}.majorColl.mean+dc.belt.maze{ii}.majorColl.std);
 yt=yMaxPerPair+yOffset;
 ytxt=num2str((dc.belt.maze{ii}.majorColl.pValue),'p=%.4f');
-if(dc.belt.maze{ii}.majorColl.pValue*100 <= 5/4)
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize,'fontweight','bold')
-else
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
+for jj = 1:3
+if(dc.belt.maze{ii}.majorColl.pValue*10 *10^jj <= 5/4)
+ytxt = ['*',ytxt];
 end
+end
+
+text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
+
 
 %plot p value overarching bar
 xLine = xFirstBar;
@@ -390,11 +395,11 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
     'Color','black','LineStyle','-','LineWidth',pbarwidth)
 
 % titles/labels
-specs2 = horzcat(['HW ' num2str(ii) ' Belt Collisions'],['HW ' num2str(ii) ' Cane Wall Taps'],' ',specs2);
+specs2 = horzcat(['HW ' num2str(ii) ' System'],['HW ' num2str(ii) ' White Cane'],' ',specs2);
 
-title('Wall Contacts - Belt vs. Cane','FontSize',titleFontSize)
+title('Wall Collisions/Contacts - System vs. White Cane','FontSize',titleFontSize)
 
-ylabel('Collisions / Taps','FontSize',titleFontSize)
+ylabel('Collisions / Contacts','FontSize',titleFontSize)
 
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
@@ -423,15 +428,15 @@ maxBarValueCane = dc.cane.maze{ii}.distance.mean+dc.cane.maze{ii}.distance.std;
 yMaxPerPair = max(maxBarValueBelt,maxBarValueCane);
 
 yOffset = 1.5;
-yt=yMaxPerPair+yOffset;
+yt=yMaxPerPair+yOffset;    
 ytxt=num2str((dc.belt.maze{ii}.distance.pValue),'p=%.3f');
-
-if(dc.belt.maze{ii}.distance.pValue*100 <= 5/4)
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize,'fontweight','bold')
-else
-    text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
+for jj = 1:3
+if(dc.belt.maze{ii}.distance.pValue*10 *10^jj <= 5/4)
+ytxt = ['*',ytxt];
+end
 end
 
+text(xt,yt,ytxt,'rotation',0,'fontsize',pValFontSize)
 
 %plot p value overarching bar
 xLine = xFirstBar;
@@ -441,17 +446,17 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
 
 % titles/labels
 
-specs3 = horzcat(['HW ' num2str(ii) ' Belt Avg Distance' ],['HW ' num2str(ii) ' Cane Avg Distance'],' ',specs3);
+specs3 = horzcat(['HW ' num2str(ii) ' System' ],['HW ' num2str(ii) ' White Cane'],' ',specs3);
 
-title('Distance Traveled - Belt vs. Cane','FontSize',titleFontSize)
+title('Path Length - System vs. White Cane','FontSize',titleFontSize)
 
-ylabel('Distance [m]','FontSize',titleFontSize)
+ylabel('Length [m]','FontSize',titleFontSize)
 
 set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 ylim([0 32]) % or your lower limit.
 
-set(sp3(1),'YTick',0:2:32)
+set(sp3(1),'YTick',0:2:31)
 
 dc.belt.mazesAll.distance.raw(ii) = dc.belt.maze{ii}.distance.mean;
 dc.cane.mazesAll.distance.raw(ii) = dc.cane.maze{ii}.distance.mean;
