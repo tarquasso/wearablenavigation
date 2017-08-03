@@ -1,3 +1,6 @@
+close all
+clear all
+
 % FILL IN YOUR computer username here:
 editorNames = {'rkk', 'brandonaraki_backup'};
 
@@ -60,13 +63,12 @@ bigTitleFontSize = 14;
 titleFontSize = 8;
 legendFontSize = 10;
 xaxisFontSize = 10;
+ttMin = inf; %init this value to inf
 ttMax = 0; %init this value to 0
 collMax = 0; %init this value to 0
+distMin = inf;%init this value to inf
 distMax = 0; %init this value to 0
-sp1 = cell(4,1);
-sp2 = cell(4,1);
-sp3 = cell(4,1);
-sp4 = cell(4,1);
+sp = cell(4,4);
 for i=1:numTests
     test1 = tests{i}{1};
     path = strcat(dropboxPath,'processedData/',test1);
@@ -124,7 +126,7 @@ for i=1:numTests
     end
     
     % Plotting
-    sp1{i} = subplot(3,3*numTests,[1 2 3 3*numTests+1 3*numTests+2 3*numTests+3]+3*(i-1));
+    sp{i,1} = subplot(3,3*numTests,[1 2 3 3*numTests+1 3*numTests+2 3*numTests+3]+3*(i-1));
     hold on
     plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','b');
     plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
@@ -169,46 +171,49 @@ for i=1:numTests
     set(gca,'visible','off')
     hold off
     
-    sp2{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
+    sp{i,2} = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
     hold on;
-    
     bar(1, tt1, 'facecolor', hsv2rgb([0.6 1 1]),...
         'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
+    ttMin = min(ttMin,tt1);
     ttMax = max(ttMax,tt1);
     bar(2, tt2, 'facecolor', hsv2rgb([0.0 1 1]),...
         'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+    ttMin = min(ttMin,tt2);
     ttMax = max(ttMax,tt2);
-    xlim(sp2{i},[xll xul])
+    xlim(sp{i,2},[xll xul])
     hold off;
     yLab2 = ylabel('Duration [s]','FontSize',titleFontSize);
     set(yLab2, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
     set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
 
-    sp3{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
+    sp{i,3} = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
     hold on;
-    
     bar(1, wallTaps, 'facecolor', hsv2rgb([0.6 0.6 1]),...
         'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
     collMax = max(collMax,wallTaps);
     bar(2, collisions, 'facecolor', hsv2rgb([0.0 0.6 1]),...
         'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
     collMax = max(collMax,collisions);
-    xlim(sp3{i},[xll xul])
+    xlim(sp{i,3},[xll xul])
     
     hold off;
     yLab3 = ylabel('Wall Contacts/Collisions','FontSize',titleFontSize);
     %set(yLab3, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
     set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
     
-    sp4{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
+    
+    sp{i,4} = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
     hold on;
     bar(1, distance1, 'facecolor', hsv2rgb([0.6 0.2 1]),...
         'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
+    distMin = min(distMin,distance1);
     distMax = max(distMax,distance1);
     bar(2, distance2, 'facecolor', hsv2rgb([0.0 0.2 1]),...
         'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+    distMin = min(distMin,distance2);
     distMax = max(distMax,distance2);
-    xlim(sp4{i},[xll xul])
+    xlim(sp{i,4},[xll xul])
     
     hold off;
     yLab4 = ylabel('Length [m]','FontSize',titleFontSize);
@@ -228,16 +233,16 @@ for i=1:numTests
 end
 
 %adjust ylims to make uniform
-for i =1:numTests
+for jj =1:numTests
 
-    ylim(sp2{i},[0 ttMax])
-    set(sp2{i},'YTick',0:floor(ttMax/5):ttMax)
+    set(sp{jj,2},'YTick',floor(linspace(ttMin,ttMax,6)))
+    ylim(sp{jj,2},[0.97*ttMin 1.03*ttMax])
 
-    ylim(sp3{i},[0 collMax])
-    set(sp3{i},'YTick',0:floor(collMax/5):collMax)
+    ylim(sp{jj,3},[0 collMax])
+    set(sp{jj,3},'YTick',0:1:collMax)
         
-    ylim(sp4{i},[0 distMax])
-    set(sp4{i},'YTick',0:floor(distMax/5):distMax)
+    ylim(sp{jj,4},[0.97*distMin 1.03*distMax])
+    set(sp{jj,4},'YTick',floor(linspace(distMin,distMax,6)))
 end
 userNo = sprintf('User %02d', userNumToID(userNumber));
 

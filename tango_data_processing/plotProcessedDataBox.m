@@ -261,17 +261,18 @@ end
 
 %adjust ylims to make uniform
 for i =1:4
-    ylim(sp{1,i},[0.9*ttMin 1.05*ttMax])
-    set(sp{1,i},'YTick',floor(ttMin):floor(ttMax/5):ceil(ttMax))
+    ylim(sp{1,i},[0.97*ttMin 1.03*ttMax])
+    %set(sp{1,i},'YTick',floor(linspace(ttMin,ttMax,6)))
     %position1 = get(gca, 'Position');
     %position1(1) = position1(1)*1.05;
     %pos(3) = pos(3)* 0.8;
     %set(gca,'Position', position1);
-    ylim(sp{2,i},[0 1])
-    set(sp{2,i},'YTick',0:1)
+    collMaxUse = max(collMax,1);
+    ylim(sp{2,i},[0 collMaxUse])
+    set(sp{2,i},'YTick',0:1:collMaxUse)
         
-    ylim(sp{3,i},[0.95*distMin 1.05*distMax])
-    set(sp{3,i},'YTick',floor(distMin):floor(distMax/5):ceil(distMax))
+    ylim(sp{3,i},[0.97*distMin 1.03*distMax])
+    %set(sp{3,i},'YTick',linspace(distMin,distMax,min(6,distMax-distMin)));
 end
     
 % annotation('textbox', [0 0.9 1 0.1], ...
