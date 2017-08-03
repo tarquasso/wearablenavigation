@@ -13,7 +13,7 @@ for k = 1:length(editorNames)
   end
 end
 
-userNumber = 11;
+userNumber = 2;
 userNumToID = [1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 13];
 
 tests1 = { ...
@@ -32,6 +32,9 @@ test1 = tests1{userNumber};
 path = strcat(dropboxPath,'processedData/',test1);
 load(path);
 
+tt = zeros(4,1);
+duration = zeros(4,1);
+
 saveAs1 = test1;
 id1 = str2num(saveAs1(1:3));
 x1 = x;
@@ -40,15 +43,15 @@ y1 = y;
 y_shift1 = y_shift;
 theta1 = theta;
 maze1 = mazeNum;
-tt1 = total_time;
+tt(1) = total_time;
 ave1 = ave_velocity;
 time1 = time;
-distance1 = distance;
+dist(1) = distance;
 if1 = index_first;
 il1 = index_last;
-if tt1 < 0
-    tt1 = (100000 + time1(il1) - time1(if1))/1000;
-    ave1 = distance1/tt1;
+if tt(1) < 0
+    tt(1) = (100000 + time1(il1) - time1(if1))/1000;
+    ave1 = dist(1)/tt(1);
 end
 
 tests2 = {...
@@ -75,15 +78,15 @@ y2 = y;
 maze2 = mazeNum;
 y_shift2 = y_shift;
 theta2 = theta;
-tt2 = total_time;
+tt(2) = total_time;
 ave2 = ave_velocity;
-distance2 = distance;
+dist(2) = distance;
 if2 = index_first;
 il2 = index_last;
 time2 = time;
-if tt2 < 0
-    tt2 = (100000 + time2(il2) - time2(if2))/1000;
-    ave2 = distance2/tt2;
+if tt(2) < 0
+    tt(2) = (100000 + time2(il2) - time2(if2))/1000;
+    ave2 = dist(2)/tt(2);
 end
 
 tests3 = { ...
@@ -109,16 +112,16 @@ x_shift3 = x_shift;
 y3 = y;
 y_shift3 = y_shift;
 theta3 = theta;
-tt3 = total_time;
+tt(3) = total_time;
 ave3 = ave_velocity;
 maze3 = mazeNum;
-distance3 = distance;
+dist(3) = distance;
 if3 = index_first;
 il3 = index_last;
 time3 = time;
-if tt3 < 0
-    tt3 = (100000 + time3(il3) - time3(if3))/1000;
-    ave3 = distance3/tt3;
+if tt(3) < 0
+    tt(3) = (100000 + time3(il3) - time3(if3))/1000;
+    ave3 = dist(3)/tt(3);
 end
 
 tests4 = { ... 
@@ -144,16 +147,16 @@ x_shift4 = x_shift;
 y4 = y;
 y_shift4 = y_shift;
 theta4 = theta;
-tt4 = total_time;
+tt(4) = total_time;
 ave4 = ave_velocity;
 maze4 = mazeNum;
-distance4 = distance;
+dist(4) = distance;
 if4 = index_first;
 il4 = index_last;
 time4 = time;
-if tt4 < 0
-    tt4 = (100000 + time4(il4) - time4(if4))/1000;
-    ave4 = distance4/tt4;
+if tt(4) < 0
+    tt(4) = (100000 + time4(il4) - time4(if4))/1000;
+    ave4 = dist(4)/tt(4);
 end
 
 file = 'data-analysis-blind-users-20160524.xlsx';
@@ -161,12 +164,13 @@ sheet = 1;
 filePath = strcat(dropboxPath,file);
 [num,txt,raw] = xlsread(filePath,sheet);
 
-collisionCol = 18;
+collisionCol = 17;
 
-collisions1 = num(id1,collisionCol);
-collisions2 = num(id2,collisionCol);
-collisions3 = num(id3,collisionCol);
-collisions4 = num(id4,collisionCol);
+collisions = zeros(4,1);
+collisions(1) = num(id1,collisionCol);
+collisions(2) = num(id2,collisionCol);
+collisions(3) = num(id3,collisionCol);
+collisions(4) = num(id4,collisionCol);
 
 f1 = figure();
 set(f1, 'Position', [30 60 1200 400])
@@ -174,78 +178,104 @@ bigTitleFontSize = 14;
 titleFontSize = 10;
 legendFontSize = 10;
 xaxisFontSize = 10;
+distMin = inf;
+ttMin = inf;
+ttMax = 0; %init this value to 0
+collMax = 0; %init this value to 0
+distMax = 0; %init this value to 0
+sp = cell(3,4);
 
 hold on
-cols = 4;
-xll = 0.5;
-xul = 3.5;
+cols = 4*3;
+xll = 0.55;
+xul = 1.45;
 
-subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]);
+subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]);
 plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze1);
-text(-2.5,6,'B','FontSize',24);
+text(0.04,0.25,sprintf('Hallway with Box %d',maze1),'Units', 'Normalized','FontSize',20,'rotation',90);
+        
 title(sprintf('Box Trial %d',maze1),'FontSize',bigTitleFontSize);
 set(gca,'visible','off')
 
 if userNumber ~= 11
-    subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+1);
+    subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3);
     plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
     plot_box(f1,maze2);
+    text(0.04,0.25,sprintf('Hallway with Box %d',maze2),'Units', 'Normalized','FontSize',20,'rotation',90);
+
     title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
     set(gca,'visible','off')
 end
 
-subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+2);
+subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3*2);
 plot(x3(if3:il3)+x_shift3,y3(if3:il3)+y_shift3,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze3);
+text(0.04,0.25,sprintf('Hallway with Box %d',maze3),'Units', 'Normalized','FontSize',20,'rotation',90);
 title(sprintf('Box Trial %d',maze3),'FontSize',bigTitleFontSize);
 set(gca,'visible','off')
 
-subplot(5,4,[1 1+cols 2*cols+1 3*cols+1]+3);
+subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3*3);
 plot(x4(if4:il4)+x_shift4,y4(if4:il4)+y_shift4,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze4);
+text(0.04,0.25,sprintf('Hallway with Box %d',maze4),'Units', 'Normalized','FontSize',20,'rotation',90);
+
 title(sprintf('Box Trial %d',maze4),'FontSize',bigTitleFontSize);
 set(gca,'visible','off')
 
-
-sp1 = subplot(5,4,4*cols+1);
-bar(1,distance1, 'facecolor', [0.4 0.4 1]);
+for ii = 1:4
+sp{1,ii} = subplot(5,cols,4*cols+3*(ii-1)+1);
 hold on
-bar(2,collisions1, 'facecolor', [0.4 1 0.4]);
-bar(3,tt1, 'facecolor', [1 0.4 0.4]);
-set(sp1, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
-xlim(sp1,[xll xul])
-hold off
+%xlim(sp{1,ii},[xll xul])
+bar(1,tt(ii), 'facecolor', hsv2rgb([0.0 1 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+ttMin = min(ttMin,tt(ii));
+ttMax = max(ttMax,tt(ii));
+hold off;
+yLab1 = ylabel('Duration [s]','FontSize',titleFontSize);
+%set(yLab1, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
 
-sp2 = subplot(5,4,4*cols+2);
+    
+set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
+    
+sp{2,ii} = subplot(5,cols,4*cols+3*(ii-1)+2);
 hold on
+%xlim(sp{2,ii},[xll xul])
+bar(1,collisions(ii), 'facecolor', hsv2rgb([0.0 0.6 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+collMax = max(collMax,collisions(ii));
+hold off;
+yLab2 = ylabel('Collisions','FontSize',titleFontSize);
+set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
 
-bar(1,distance2, 'facecolor', [0.4 0.4 1]);
-bar(2,collisions2, 'facecolor', [0.4 1 0.4]);
-
-bar(3,tt2, 'facecolor', [1 0.4 0.4]);
-set(sp2, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
-xlim(sp2,[xll xul])
-hold off
-
-sp3 = subplot(5,4,4*cols+3);
-bar(1,distance3, 'facecolor', [0.4 0.4 1]);
+sp{3,ii} = subplot(5,cols,4*cols+3*(ii-1)+3);
 hold on
-bar(2,collisions3, 'facecolor', [0.4 1 0.4]);
-bar(3,tt3, 'facecolor', [1 0.4 0.4]);
-set(sp3, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
-xlim(sp3,[xll xul])
-hold off
+%xlim(sp{3,ii},[xll xul])
+bar(1,dist(ii), 'facecolor', hsv2rgb([0.0 0.2 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+distMin = min(distMin,dist(ii));
+distMax = max(distMax,dist(ii));
+hold off;
+yLab3 = ylabel('Length [m]','FontSize',titleFontSize);
+%set(yLab4, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
+set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
+end
 
-sp4 = subplot(5,4,4*cols+4);
-bar(1,distance4, 'facecolor', [0.4 0.4 1]);
-hold on
-bar(2,collisions4, 'facecolor', [0.4 1 0.4]);
-bar(3,tt4, 'facecolor', [1 0.4 0.4]);
-set(sp4, 'XTick', 1:3, 'XTickLabel', {'Distance [m]','Collisions', 'Duration [s]'},'FontSize',xaxisFontSize);
-xlim(sp4,[xll xul])
-hold off
-
+%adjust ylims to make uniform
+for i =1:4
+    ylim(sp{1,i},[0.9*ttMin 1.05*ttMax])
+    set(sp{1,i},'YTick',floor(ttMin):floor(ttMax/5):ceil(ttMax))
+    %position1 = get(gca, 'Position');
+    %position1(1) = position1(1)*1.05;
+    %pos(3) = pos(3)* 0.8;
+    %set(gca,'Position', position1);
+    ylim(sp{2,i},[0 1])
+    set(sp{2,i},'YTick',0:1)
+        
+    ylim(sp{3,i},[0.95*distMin 1.05*distMax])
+    set(sp{3,i},'YTick',floor(distMin):floor(distMax/5):ceil(distMax))
+end
+    
 % annotation('textbox', [0 0.9 1 0.1], ...
 %     'String', 'User 13', ...
 %     'EdgeColor', 'none', ...

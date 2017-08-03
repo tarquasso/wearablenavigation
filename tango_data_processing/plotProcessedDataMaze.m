@@ -13,7 +13,7 @@ for k = 1:length(editorNames)
   end
 end
 
-userNumber = 11;
+userNumber = 2;
 
 users = { ...
 {{'005 user01 PP 01c cane mz1','009 user01 PP 06b belt mz1'},{'002 user01 PP 02a cane mz2','006 user01 PP 04a belt mz2'},{'003 user01 PP 03a cane mz3','007 user01 PP 05a belt mz3'}}, ...
@@ -43,25 +43,30 @@ userNumToID = [1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 13];
 tests = users{userNumber};
 numTests = numel(tests);
 
-file = 'data-analysis-blind-users-20160524.xlsx';
+file = 'data-analysis-blind-users-20160524rev1.xlsx';
 sheet = 1;
 filePath = strcat(dropboxPath,file);
 [num,txt,raw] = xlsread(filePath,sheet);
 
-wallTapCol = 15;
-collisionCol = 18;
+wallTapCol = 16;
+collisionCol = 17;
 
 xll = 0.6;
 xul = 2.4;
 
 f1 = figure();
 set(f1, 'Position', [30 60 1200 400]);
-
 bigTitleFontSize = 14;
-titleFontSize = 10;
+titleFontSize = 8;
 legendFontSize = 10;
 xaxisFontSize = 10;
-
+ttMax = 0; %init this value to 0
+collMax = 0; %init this value to 0
+distMax = 0; %init this value to 0
+sp1 = cell(4,1);
+sp2 = cell(4,1);
+sp3 = cell(4,1);
+sp4 = cell(4,1);
 for i=1:numTests
     test1 = tests{i}{1};
     path = strcat(dropboxPath,'processedData/',test1);
@@ -119,7 +124,7 @@ for i=1:numTests
     end
     
     % Plotting
-    sp1 = subplot(3,3*numTests,[1 2 3 3*numTests+1 3*numTests+2 3*numTests+3]+3*(i-1));
+    sp1{i} = subplot(3,3*numTests,[1 2 3 3*numTests+1 3*numTests+2 3*numTests+3]+3*(i-1));
     hold on
     plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','b');
     plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
@@ -128,26 +133,34 @@ for i=1:numTests
         plot([-3 -3],[0.45,0.55],'k');
         plot([-2 -2],[0.45,0.55],'k');
         text(-2.8,0.27,'1m');
-        text(-5,6,'A','FontSize',24);
-    elseif i==2 || i==3
+        text(0.04,0.45,'Hallway 1','Units', 'Normalized','FontSize',20,'rotation',90);
+    elseif i==2
         plot([-0.5 0.5],[0.5,0.5],'k');
         plot([-0.5 -0.5],[0.45,0.55],'k');
         plot([0.5 0.5],[0.45,0.55],'k');
         text(-0.25,0.27,'1m');
+        text(0.04,0.45,'Hallway 2','Units', 'Normalized','FontSize',20,'rotation',90);
+    elseif i==3
+        plot([-0.5 0.5],[0.5,0.5],'k');
+        plot([-0.5 -0.5],[0.45,0.55],'k');
+        plot([0.5 0.5],[0.45,0.55],'k');
+        text(-0.25,0.27,'1m');
+        text(0.04,0.45,'Hallway 3','Units', 'Normalized','FontSize',20,'rotation',90);
     elseif i==4
         plot([-3 -2],[1.9,1.9],'k');
         plot([-3 -3],[1.85,1.95],'k');
         plot([-2 -2],[1.85,1.95],'k');
         text(-2.8,1.67,'1m');
+        text(0.04,0.45,'Hallway 4','Units', 'Normalized','FontSize',20,'rotation',90);
     end
     if i==1 || i==2
         legendLocation = 'southeast';
-        legend({'cane','belt'},'Location',legendLocation,'FontSize',legendFontSize);
+        legend({'cane','system'},'Location',legendLocation,'FontSize',legendFontSize);
     elseif i==3
         legendLocation = 'northeast';
-        legend({'cane','belt'},'Position',[0.645,0.81,0.05,0.05],'FontSize',legendFontSize);
+        legend({'cane','system'},'Position',[0.645,0.81,0.05,0.05],'FontSize',legendFontSize);
     elseif i==4
-        legend({'cane','belt'},'Position',[0.835,0.703,0.05,0.05],'FontSize',legendFontSize);
+        legend({'cane','system'},'Position',[0.835,0.703,0.05,0.05],'FontSize',legendFontSize);
     end
     %title(sprintf('User %02d Maze %d',userNum,mazeNum),'FontSize',bigTitleFontSize);
     title(sprintf('Maze %d',mazeNum),'FontSize',bigTitleFontSize);
@@ -156,33 +169,52 @@ for i=1:numTests
     set(gca,'visible','off')
     hold off
     
-    sp2 = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
+    sp2{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+1);
     hold on;
-    bar(1, distance1, 'facecolor', [0.1 0.1 1]);
-    bar(2, distance2, 'facecolor', [1 0.1 0.1]);
-    xlim(sp2,[xll xul])
-    hold off;
-    ylabel('Distance [m]','FontSize',titleFontSize);
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
-
-    sp3 = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
-    hold on;
-    bar(1, wallTaps, 'facecolor', [0.4 0.4 1]);
-    bar(2, collisions, 'facecolor', [1 0.4 0.4]);
-    xlim(sp3,[xll xul])
-    hold off;
-    ylabel('Wall Taps / Collisions','FontSize',titleFontSize);
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
     
-    sp4 = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
-    hold on;
-    bar(1, tt1, 'facecolor', [0.77 0.77 1]);
-    bar(2, tt2, 'facecolor', [1 0.77 0.77]);
-    xlim(sp4,[xll xul])
+    bar(1, tt1, 'facecolor', hsv2rgb([0.6 1 1]),...
+        'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
+    ttMax = max(ttMax,tt1);
+    bar(2, tt2, 'facecolor', hsv2rgb([0.0 1 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+    ttMax = max(ttMax,tt2);
+    xlim(sp2{i},[xll xul])
     hold off;
-    ylabel('Duration [s]','FontSize',titleFontSize)
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','belt'},'FontSize',xaxisFontSize);
+    yLab2 = ylabel('Duration [s]','FontSize',titleFontSize);
+    set(yLab2, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
 
+    sp3{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
+    hold on;
+    
+    bar(1, wallTaps, 'facecolor', hsv2rgb([0.6 0.6 1]),...
+        'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
+    collMax = max(collMax,wallTaps);
+    bar(2, collisions, 'facecolor', hsv2rgb([0.0 0.6 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+    collMax = max(collMax,collisions);
+    xlim(sp3{i},[xll xul])
+    
+    hold off;
+    yLab3 = ylabel('Wall Contacts/Collisions','FontSize',titleFontSize);
+    %set(yLab3, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
+    
+    sp4{i} = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
+    hold on;
+    bar(1, distance1, 'facecolor', hsv2rgb([0.6 0.2 1]),...
+        'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1);
+    distMax = max(distMax,distance1);
+    bar(2, distance2, 'facecolor', hsv2rgb([0.0 0.2 1]),...
+        'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
+    distMax = max(distMax,distance2);
+    xlim(sp4{i},[xll xul])
+    
+    hold off;
+    yLab4 = ylabel('Length [m]','FontSize',titleFontSize);
+    %set(yLab4, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
+    
 %     subplot(4,2*numTests,6*numTests+2*(i-1)+1)
 %     hold on;
 %     bar(1, ave1, 'facecolor', 'b');
@@ -195,7 +227,18 @@ for i=1:numTests
     %line([0,0],[0,1],'parent',ah,'linewidth',1);
 end
 
+%adjust ylims to make uniform
+for i =1:numTests
 
+    ylim(sp2{i},[0 ttMax])
+    set(sp2{i},'YTick',0:floor(ttMax/5):ttMax)
+
+    ylim(sp3{i},[0 collMax])
+    set(sp3{i},'YTick',0:floor(collMax/5):collMax)
+        
+    ylim(sp4{i},[0 distMax])
+    set(sp4{i},'YTick',0:floor(distMax/5):distMax)
+end
 userNo = sprintf('User %02d', userNumToID(userNumber));
 
 annotation('textbox', [0 0.9 1 0.1], ...
@@ -203,3 +246,5 @@ annotation('textbox', [0 0.9 1 0.1], ...
     'EdgeColor', 'none', ...
     'HorizontalAlignment', 'center',...
     'FontSize', 30);
+
+%set(gca,'TickLabelInterpreter', 'latex')

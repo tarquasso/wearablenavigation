@@ -1,7 +1,7 @@
 function plot_box(f1,num)
 
 h = 1.1;
-bw = 0.7; %box width
+bw = 0.8; %box width
 bh = 0.35; %box 'height'/depth
 wd = 0.8; %wall displacement from the center
 
@@ -17,6 +17,7 @@ plot([-2.2 -1.2],[0.5,0.5],'k');
 plot([-2.2 -2.2],[0.45,0.55],'k');
 plot([-1.2 -1.2],[0.45,0.55],'k');
 text(-1.8,0.27,'1m');
+
 
 axis([-2.2 2.2 0 inf]);
 
