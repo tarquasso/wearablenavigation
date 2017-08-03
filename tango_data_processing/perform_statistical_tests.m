@@ -179,7 +179,7 @@ dc.cane.maze{ii}.durationTango.pValue = h;
 dc.cane.maze{ii}.durationTango.pValue = p;
 
 [h,p,ci,stats] = ttest(dc.belt.maze{ii}.majorColl.raw,...
-    dc.cane.maze{ii}.wallTaps.raw, 'Alpha',0.05/4)
+    dc.cane.maze{ii}.wallTaps.raw, 'Alpha',0.05/4);
 dc.belt.maze{ii}.majorColl.pValue = p;
 dc.cane.maze{ii}.majorColl.pValue = p;
 
@@ -289,12 +289,17 @@ for ii = numOfMazes:-1:1
 sp1 = subplot(1,3,1);
 xlim(sp1,[offset 3*numOfMazes+offset])
 
-bar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0 0.7 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
-hold on;
-errorbar((ii-1)*3+offset+1,dc.belt.maze{ii}.durationTango.mean,dc.belt.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
+bar((ii-1)*3+offset+1,dc.cane.maze{ii}.durationTango.mean,...
+    'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+hold on
+errorbar((ii-1)*3+offset+1,dc.cane.maze{ii}.durationTango.mean,...
+    dc.cane.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,'FaceColor',hsv2rgb([0.6 0.7 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
-errorbar((ii-1)*3+offset+2,dc.cane.maze{ii}.durationTango.mean,dc.cane.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
+bar((ii-1)*3+offset+2,dc.belt.maze{ii}.durationTango.mean,...
+    'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+errorbar((ii-1)*3+offset+2,dc.belt.maze{ii}.durationTango.mean,...
+    dc.belt.maze{ii}.durationTango.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
+
 
 %plot p values
 xFirstBar = (ii-1)*3+offset+1;
@@ -322,8 +327,8 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
     'Color','black','LineStyle','-','LineWidth',pbarwidth)
 
 
-specs1 = horzcat(['HW ' num2str(ii) ' System'],['HW ' num2str(ii) ' White Cane'],' ',specs1);
-title('Trial Duration - System vs. White Cane','FontSize',titleFontSize)
+specs1 = horzcat(['HW ' num2str(ii) ' White Cane'],['HW ' num2str(ii) ' System'],' ',specs1);
+title('Trial Duration - White Cane vs. System','FontSize',titleFontSize)
 
 ylabel('Duration [s]','FontSize',titleFontSize)
 set(gca,'Xtick',offset+1:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs1,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
@@ -357,18 +362,19 @@ xlim(sp2,[offset 3*numOfMazes+offset])
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.3 0.4 0.8]),'EdgeColor',hsv2rgb([0.3 1 1]),'LineWidth',1.5);
 % bar((ii-1)*3+2,dc.cane.maze{ii}.wallTaps.min,'FaceColor',hsv2rgb([0.3 1 1]),'EdgeColor',hsv2rgb([0.3 0.4 1]),'LineWidth',1.5);
 
-bar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,'FaceColor',...
-    hsv2rgb([0 0.7 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
-hold on;
-errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.majorColl.mean,...
+bar((ii-1)*3+offset+1,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.6 0.6 1]),...
+    'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
+hold on
+errorbar((ii-1)*3+offset+1,dc.cane.maze{ii}.wallTaps.mean,...
+    min(dc.cane.maze{ii}.wallTaps.std,dc.cane.maze{ii}.wallTaps.deltaLow),...
+    dc.cane.maze{ii}.wallTaps.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
+
+bar((ii-1)*3+offset+2,dc.belt.maze{ii}.majorColl.mean,'FaceColor',hsv2rgb([0 0.6 1.0]),...
+    'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+errorbar((ii-1)*3+offset+2,dc.belt.maze{ii}.majorColl.mean,...
     min(dc.belt.maze{ii}.majorColl.std,dc.belt.maze{ii}.majorColl.deltaLow),...
     dc.belt.maze{ii}.majorColl.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6]),'linestyle','none'); 
 
-bar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,'FaceColor',hsv2rgb([0.6 0.7 1]),...
-    'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
-errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.wallTaps.mean,...
-    min(dc.cane.maze{ii}.wallTaps.std,dc.cane.maze{ii}.wallTaps.deltaLow),...
-    dc.cane.maze{ii}.wallTaps.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6]),'linestyle','none'); 
 
 %add p-value
 xFirstBar = (ii-1)*3+offset+1;
@@ -395,13 +401,14 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
     'Color','black','LineStyle','-','LineWidth',pbarwidth)
 
 % titles/labels
-specs2 = horzcat(['HW ' num2str(ii) ' System'],['HW ' num2str(ii) ' White Cane'],' ',specs2);
+specs2 = horzcat(['HW ' num2str(ii) ' White Cane'],['HW ' num2str(ii) ' System'],' ',specs2);
 
-title('Wall Collisions/Contacts - System vs. White Cane','FontSize',titleFontSize)
+title('Wall Collisions/Contacts - White Cane vs. System','FontSize',titleFontSize)
 
 ylabel('Collisions / Contacts','FontSize',titleFontSize)
 
-set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
+set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs2,...
+    'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 dc.belt.mazesAll.majorColl.raw(ii) = dc.belt.maze{ii}.majorColl.mean;
 dc.cane.mazesAll.wallTaps.raw(ii) = dc.cane.maze{ii}.wallTaps.mean;
@@ -413,12 +420,17 @@ ylim([0 23.5]) % or your lower limit.
 %% DISTANCE
 sp3 = subplot(1,3,3);
 xlim(sp3,[offset 3*numOfMazes+offset])
-bar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0 1 1.0]),'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+bar((ii-1)*3+offset+1,dc.cane.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 0.2 1]),...
+    'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
 hold on;
-errorbar((ii-1)*3+1+offset,dc.belt.maze{ii}.distance.mean,dc.belt.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6])); 
+errorbar((ii-1)*3+offset+1,dc.cane.maze{ii}.distance.mean,dc.cane.maze{ii}.distance.std,...
+    'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6])); 
 
-bar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0.6 1 1]),'EdgeColor',hsv2rgb([0.6 1 1]),'LineWidth',1.5);
-errorbar((ii-1)*3+2+offset,dc.cane.maze{ii}.distance.mean,dc.cane.maze{ii}.distance.std,'LineWidth',1.5,'Color',hsv2rgb([0.6 1 0.6])); 
+bar((ii-1)*3+offset+2,dc.belt.maze{ii}.distance.mean,'FaceColor',hsv2rgb([0 0.2 1]),...
+    'EdgeColor',hsv2rgb([0 1 1]),'LineWidth',1.5);
+errorbar((ii-1)*3+offset+2,dc.belt.maze{ii}.distance.mean,dc.belt.maze{ii}.distance.std,...
+    'LineWidth',1.5,'Color',hsv2rgb([0 1 0.6])); 
+
 
 %add p-value
 xFirstBar = (ii-1)*3+offset+1;
@@ -446,13 +458,14 @@ line([xLine,xLine,xLine+1,xLine+1],[yLine-yOffset/4,yLine,yLine,yLine-yOffset/4]
 
 % titles/labels
 
-specs3 = horzcat(['HW ' num2str(ii) ' System' ],['HW ' num2str(ii) ' White Cane'],' ',specs3);
+specs3 = horzcat(['HW ' num2str(ii) ' White Cane'],['HW ' num2str(ii) ' System' ],' ',specs3);
 
-title('Path Length - System vs. White Cane','FontSize',titleFontSize)
+title('Path Length - White Cane vs. System','FontSize',titleFontSize)
 
 ylabel('Length [m]','FontSize',titleFontSize)
 
-set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
+set(gca,'Xtick',1+offset:numOfMazes*3+numOfMazes+offset,'XTickLabel',specs3,...
+    'XTickLabelRotation',axisRotation,'FontSize',xaxisFontSize)
 
 ylim([0 32]) % or your lower limit.
 
