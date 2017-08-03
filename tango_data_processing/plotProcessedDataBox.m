@@ -159,12 +159,12 @@ if tt(4) < 0
     ave4 = dist(4)/tt(4);
 end
 
-file = 'data-analysis-blind-users-20160524.xlsx';
+file = 'data-analysis-blind-users-20160524rev1.xlsx';
 sheet = 1;
 filePath = strcat(dropboxPath,file);
 [num,txt,raw] = xlsread(filePath,sheet);
 
-collisionCol = 17;
+collisionCol = 17; %verify with spreadsheet
 
 collisions = zeros(4,1);
 collisions(1) = num(id1,collisionCol);
@@ -189,42 +189,40 @@ hold on
 cols = 4*3;
 xll = 0.55;
 xul = 1.45;
+subPlotHeight = 3;
 
-subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]);
+subplot(subPlotHeight,cols,[1 2 cols+1 cols+2  2*cols+1 2*cols+2]);
 plot(x1(if1:il1)+x_shift1,y1(if1:il1)+y_shift1,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze1);
-text(0.04,0.25,sprintf('Hallway with Box %d',maze1),'Units', 'Normalized','FontSize',20,'rotation',90);
-        
-title(sprintf('Box Trial %d',maze1),'FontSize',bigTitleFontSize);
+text(0.04,0.49,sprintf('Hallway with Box %d',maze1),'Units', 'Normalized','FontSize',20,'rotation',90);        
+% title(sprintf('Box Trial %d',maze1),'FontSize',bigTitleFontSize);
 set(gca,'visible','off')
 
 if userNumber ~= 11
-    subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3);
+    subplot(subPlotHeight,cols,[1 2 cols+1 cols+2  2*cols+1 2*cols+2]+3);
     plot(x2(if2:il2)+x_shift2,y2(if2:il2)+y_shift2,'LineWidth',2.5,'Color','r');
     plot_box(f1,maze2);
-    text(0.04,0.25,sprintf('Hallway with Box %d',maze2),'Units', 'Normalized','FontSize',20,'rotation',90);
-
-    title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
-    set(gca,'visible','off')
+    text(0.04,0.49,sprintf('Hallway with Box %d',maze2),'Units', 'Normalized','FontSize',20,'rotation',90);
+%     title(sprintf('Box Trial %d',maze2),'FontSize',bigTitleFontSize);
+     set(gca,'visible','off')
 end
 
-subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3*2);
+subplot(subPlotHeight,cols,[1 2 cols+1 cols+2  2*cols+1 2*cols+2]+3*2);
 plot(x3(if3:il3)+x_shift3,y3(if3:il3)+y_shift3,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze3);
-text(0.04,0.25,sprintf('Hallway with Box %d',maze3),'Units', 'Normalized','FontSize',20,'rotation',90);
-title(sprintf('Box Trial %d',maze3),'FontSize',bigTitleFontSize);
-set(gca,'visible','off')
+ text(0.04,0.49,sprintf('Hallway with Box %d',maze3),'Units', 'Normalized','FontSize',20,'rotation',90);
+% title(sprintf('Box Trial %d',maze3),'FontSize',bigTitleFontSize);
+ set(gca,'visible','off')
 
-subplot(5,4*3,[1 2 3 cols+1 cols+2 cols+3 2*cols+1 2*cols+2 2*cols+3 3*cols+1 3*cols+2 3*cols+3]+3*3);
+subplot(subPlotHeight,cols,[1 2 cols+1 cols+2  2*cols+1 2*cols+2]+3*3);
 plot(x4(if4:il4)+x_shift4,y4(if4:il4)+y_shift4,'LineWidth',2.5,'Color','r');
 plot_box(f1,maze4);
-text(0.04,0.25,sprintf('Hallway with Box %d',maze4),'Units', 'Normalized','FontSize',20,'rotation',90);
-
-title(sprintf('Box Trial %d',maze4),'FontSize',bigTitleFontSize);
-set(gca,'visible','off')
+ text(0.04,0.49,sprintf('Hallway with Box %d',maze4),'Units', 'Normalized','FontSize',20,'rotation',90);
+% title(sprintf('Box Trial %d',maze4),'FontSize',bigTitleFontSize);
+ set(gca,'visible','off')
 
 for ii = 1:4
-sp{1,ii} = subplot(5,cols,4*cols+3*(ii-1)+1);
+sp{1,ii} = subplot(subPlotHeight,cols,3+3*(ii-1));
 hold on
 %xlim(sp{1,ii},[xll xul])
 bar(1,tt(ii), 'facecolor', hsv2rgb([0.0 1 1]),...
@@ -238,17 +236,17 @@ yLab1 = ylabel('Duration [s]','FontSize',titleFontSize);
     
 set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
     
-sp{2,ii} = subplot(5,cols,4*cols+3*(ii-1)+2);
+sp{2,ii} = subplot(subPlotHeight,cols,3+3*(ii-1)+cols);
 hold on
 %xlim(sp{2,ii},[xll xul])
 bar(1,collisions(ii), 'facecolor', hsv2rgb([0.0 0.6 1]),...
         'EdgeColor',hsv2rgb([0.0 1 1]),'LineWidth',1);
 collMax = max(collMax,collisions(ii));
 hold off;
-yLab2 = ylabel('Collisions','FontSize',titleFontSize);
+yLab2 = ylabel('# of Collisions','FontSize',titleFontSize);
 set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
 
-sp{3,ii} = subplot(5,cols,4*cols+3*(ii-1)+3);
+sp{3,ii} = subplot(subPlotHeight,cols,3+3*(ii-1)+2*cols);
 hold on
 %xlim(sp{3,ii},[xll xul])
 bar(1,dist(ii), 'facecolor', hsv2rgb([0.0 0.2 1]),...
