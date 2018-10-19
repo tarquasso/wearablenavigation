@@ -157,12 +157,12 @@ for i=1:numTests
     end
     if i==1 || i==2
         legendLocation = 'southeast';
-        legend({'cane','system'},'Location',legendLocation,'FontSize',legendFontSize);
+        legend({'cane','ALVU'},'Location',legendLocation,'FontSize',legendFontSize);
     elseif i==3
         legendLocation = 'northeast';
-        legend({'cane','system'},'Position',[0.645,0.81,0.05,0.05],'FontSize',legendFontSize);
+        legend({'cane','ALVU'},'Position',[0.645,0.81,0.05,0.05],'FontSize',legendFontSize);
     elseif i==4
-        legend({'cane','system'},'Position',[0.835,0.703,0.05,0.05],'FontSize',legendFontSize);
+        legend({'cane','ALVU'},'Position',[0.835,0.703,0.05,0.05],'FontSize',legendFontSize);
     end
     %title(sprintf('User %02d Maze %d',userNum,mazeNum),'FontSize',bigTitleFontSize);
     title(sprintf('Maze %d',mazeNum),'FontSize',bigTitleFontSize);
@@ -184,8 +184,8 @@ for i=1:numTests
     xlim(sp{i,2},[xll xul])
     hold off;
     yLab2 = ylabel('Duration [s]','FontSize',titleFontSize);
-    set(yLab2, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
+    %set(yLab2, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','ALVU'},'FontSize',xaxisFontSize);
 
     sp{i,3} = subplot(3,3*numTests,6*numTests+3*(i-1)+2);
     hold on;
@@ -200,7 +200,7 @@ for i=1:numTests
     hold off;
     yLab3 = ylabel('Wall Contacts/Collisions','FontSize',titleFontSize);
     %set(yLab3, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','ALVU'},'FontSize',xaxisFontSize);
     
     
     sp{i,4} = subplot(3,3*numTests,6*numTests+3*(i-1)+3);
@@ -218,7 +218,7 @@ for i=1:numTests
     hold off;
     yLab4 = ylabel('Length [m]','FontSize',titleFontSize);
     %set(yLab4, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
-    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','syst.'},'FontSize',xaxisFontSize);
+    set(gca, 'XTick', 1:2, 'XTickLabel', {'cane','ALVU'},'FontSize',xaxisFontSize);
     
 %     subplot(4,2*numTests,6*numTests+2*(i-1)+1)
 %     hold on;

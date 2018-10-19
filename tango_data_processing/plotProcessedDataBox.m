@@ -234,7 +234,7 @@ yLab1 = ylabel('Duration [s]','FontSize',titleFontSize);
 %set(yLab1, 'Units', 'Normalized', 'Position', [-0.35, 0.5, 0]);
 
     
-set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
+set(gca, 'XTick', 1, 'XTickLabel', {'ALVU'},'FontSize',xaxisFontSize);
     
 sp{2,ii} = subplot(subPlotHeight,cols,3+3*(ii-1)+cols);
 hold on
@@ -244,7 +244,7 @@ bar(1,collisions(ii), 'facecolor', hsv2rgb([0.0 0.6 1]),...
 collMax = max(collMax,collisions(ii));
 hold off;
 yLab2 = ylabel('# of Collisions','FontSize',titleFontSize);
-set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
+set(gca, 'XTick', 1, 'XTickLabel', {'ALVU'},'FontSize',xaxisFontSize);
 
 sp{3,ii} = subplot(subPlotHeight,cols,3+3*(ii-1)+2*cols);
 hold on
@@ -256,7 +256,7 @@ distMax = max(distMax,dist(ii));
 hold off;
 yLab3 = ylabel('Length [m]','FontSize',titleFontSize);
 %set(yLab4, 'Units', 'Normalized', 'Position', [-0.2, 0.5, 0]);
-set(gca, 'XTick', 1, 'XTickLabel', {'system'},'FontSize',xaxisFontSize);
+set(gca, 'XTick', 1, 'XTickLabel', {'ALVU'},'FontSize',xaxisFontSize);
 end
 
 %adjust ylims to make uniform
